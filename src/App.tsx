@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import Header from './components/Header';
 import EpiCalculator from './components/EpiCalculator';
 import ScreeningCalc from './components/ScreeningCalc';
-import SIRPlaceholder from './components/SIRPlaceholder';
+import SIRSimulator from './components/SIRSimulator/SIRSimulator';
 import type { Lang } from './i18n/translations';
 import './styles/variables.css';
 import './App.css';
@@ -57,7 +57,7 @@ function App() {
       <main className="app-main">
         {tab === 'epi' && <EpiCalculator lang={lang} />}
         {tab === 'screening' && <ScreeningCalc lang={lang} />}
-        {tab === 'sir' && <SIRPlaceholder lang={lang} />}
+        {tab === 'sir' && <SIRSimulator lang={lang} />}
       </main>
       <footer className="app-footer">
         <div className="footer-inner">

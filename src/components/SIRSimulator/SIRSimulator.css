@@ -1,0 +1,315 @@
+.sir-simulator {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: var(--space-8) var(--space-6);
+  animation: fadeUp 0.4s ease both;
+}
+
+/* Reuse fadeUp from EpiCalculator */
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(16px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* ── Two-column layout ── */
+.sir-layout {
+  display: grid;
+  grid-template-columns: 340px 1fr;
+  gap: var(--space-8);
+  align-items: start;
+}
+
+.sir-left {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+.sir-right {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-5);
+}
+
+/* ── Shared section label ── */
+.sir-section-label {
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--text-muted);
+  margin-bottom: var(--space-3);
+}
+
+/* ── Model Toggle ── */
+.sir-model-toggle {
+  background: var(--bg-surface);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  padding: var(--space-4) var(--space-5);
+}
+
+.sir-toggle-btns {
+  display: flex;
+  gap: var(--space-2);
+}
+
+.sir-toggle-btn {
+  flex: 1;
+  padding: var(--space-2) var(--space-3);
+  border-radius: var(--radius-sm);
+  font-family: var(--font-mono);
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  border: 1px solid var(--border-color);
+  background: transparent;
+  color: var(--text-secondary);
+  transition: all var(--transition-fast);
+}
+
+.sir-toggle-btn.active {
+  background: var(--color-primary);
+  color: var(--text-on-primary);
+  border-color: var(--color-primary);
+}
+
+.sir-toggle-btn:hover:not(.active) {
+  background: var(--bg-surface-2);
+  border-color: var(--text-muted);
+}
+
+/* ── R₀ Card ── */
+.sir-r0-card {
+  background: var(--bg-surface);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  padding: var(--space-4) var(--space-5);
+}
+
+.sir-r0-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  margin-bottom: var(--space-2);
+  gap: var(--space-3);
+}
+
+.sir-r0-label {
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+  font-weight: 500;
+}
+
+.sir-r0-formula {
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  color: var(--text-muted);
+  white-space: nowrap;
+}
+
+.sir-r0-value {
+  font-family: var(--font-display);
+  font-size: 2.4rem;
+  font-weight: 400;
+  line-height: 1;
+  letter-spacing: -0.03em;
+}
+
+.sir-r0-value.danger { color: var(--color-danger); }
+.sir-r0-value.safe   { color: var(--color-primary); }
+
+.sir-r0-status {
+  font-size: 0.8rem;
+  font-weight: 500;
+  margin-top: var(--space-1);
+}
+
+.sir-r0-status.danger { color: var(--color-danger-light); }
+.sir-r0-status.safe   { color: var(--color-primary-light); }
+
+.sir-herd-threshold {
+  margin-top: var(--space-2);
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  font-family: var(--font-mono);
+}
+
+.sir-herd-threshold strong {
+  color: var(--text-secondary);
+}
+
+/* ── Parameters Panel ── */
+.sir-params-panel {
+  background: var(--bg-surface);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  padding: var(--space-4) var(--space-5);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+.sir-param-item {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+}
+
+.sir-param-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.sir-param-label {
+  font-size: 0.85rem;
+  font-weight: 500;
+  color: var(--text-primary);
+}
+
+.sir-param-display {
+  font-family: var(--font-mono);
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--color-primary);
+}
+
+.sir-param-range {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 100%;
+  height: 4px;
+  border-radius: 2px;
+  background: var(--bg-surface-3);
+  outline: none;
+  cursor: pointer;
+  accent-color: var(--color-primary);
+  margin-top: var(--space-1);
+}
+
+.sir-param-range::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: var(--color-primary);
+  cursor: pointer;
+  transition: transform var(--transition-fast), box-shadow var(--transition-fast);
+}
+
+.sir-param-range::-webkit-slider-thumb:hover {
+  transform: scale(1.15);
+  box-shadow: 0 0 0 4px rgba(26, 107, 74, 0.2);
+}
+
+.sir-param-range::-moz-range-thumb {
+  width: 16px;
+  height: 16px;
+  border: none;
+  border-radius: 50%;
+  background: var(--color-primary);
+  cursor: pointer;
+}
+
+.sir-param-number {
+  width: 100%;
+  padding: var(--space-2) var(--space-3);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-sm);
+  background: var(--bg-surface-2);
+  color: var(--text-primary);
+  font-family: var(--font-mono);
+  font-size: 0.875rem;
+  transition: border-color var(--transition-fast), box-shadow var(--transition-fast);
+  margin-top: var(--space-1);
+}
+
+.sir-param-number:focus {
+  outline: none;
+  border-color: var(--color-primary);
+  box-shadow: var(--shadow-focus);
+}
+
+/* ── Chart Card ── */
+.sir-chart-card {
+  background: var(--bg-surface);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  padding: var(--space-5) var(--space-5) var(--space-4);
+}
+
+.sir-chart-title {
+  font-family: var(--font-display);
+  font-size: 1.15rem;
+  font-weight: 400;
+  color: var(--text-primary);
+  letter-spacing: -0.02em;
+  margin-bottom: var(--space-4);
+}
+
+/* ── Stats Grid ── */
+.sir-stats-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--space-4);
+}
+
+.sir-stat-card {
+  background: var(--bg-surface);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  padding: var(--space-4) var(--space-5);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+}
+
+.sir-stat-label {
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--text-muted);
+}
+
+.sir-stat-value {
+  font-family: var(--font-mono);
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  line-height: 1.2;
+}
+
+.sir-stat-sub {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  font-family: var(--font-mono);
+}
+
+/* ── Responsive ── */
+@media (max-width: 960px) {
+  .sir-layout {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 600px) {
+  .sir-simulator {
+    padding: var(--space-5) var(--space-4);
+  }
+  .sir-stats-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+  .sir-r0-top {
+    flex-direction: column;
+    gap: var(--space-1);
+  }
+}
+
+@media (max-width: 400px) {
+  .sir-stats-grid {
+    grid-template-columns: 1fr;
+  }
+}
