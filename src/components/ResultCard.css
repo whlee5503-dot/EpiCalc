@@ -1,0 +1,130 @@
+:root {
+  --rc-accent: var(--color-primary);
+}
+
+.result-card {
+  background: var(--bg-surface);
+  border: 1px solid var(--border-color);
+  border-left: 4px solid var(--rc-accent, var(--color-primary));
+  border-radius: var(--radius-md);
+  padding: var(--space-5);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  transition: box-shadow var(--transition-fast);
+}
+
+.result-card:hover {
+  box-shadow: var(--shadow-md);
+}
+
+.result-card--undefined {
+  opacity: 0.5;
+  border-left-color: var(--border-color);
+}
+
+.rc-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.rc-label {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+.rc-value-row {
+  display: flex;
+  align-items: baseline;
+  gap: var(--space-3);
+  flex-wrap: wrap;
+}
+
+.rc-value {
+  font-family: var(--font-mono);
+  font-size: 2rem;
+  font-weight: 500;
+  color: var(--rc-accent, var(--color-primary));
+  line-height: 1;
+}
+
+.rc-ci-text {
+  font-size: 0.78rem;
+  color: var(--text-muted);
+  font-family: var(--font-mono);
+}
+
+/* CI Bar */
+.rc-ci-bar-container {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+}
+
+.rc-ci-bar {
+  height: 6px;
+  background: var(--bg-surface-3);
+  border-radius: 3px;
+  position: relative;
+  overflow: visible;
+}
+
+.rc-ci-range {
+  position: absolute;
+  left: 10%;
+  right: 10%;
+  top: 0;
+  height: 100%;
+  background: color-mix(in srgb, var(--rc-accent, var(--color-primary)) 25%, transparent);
+  border-radius: 3px;
+}
+
+.rc-ci-point {
+  position: absolute;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  width: 12px;
+  height: 12px;
+  background: var(--rc-accent, var(--color-primary));
+  border: 2px solid var(--bg-surface);
+  border-radius: 50%;
+  box-shadow: var(--shadow-sm);
+  z-index: 1;
+}
+
+.rc-ci-endpoints {
+  display: flex;
+  justify-content: space-between;
+  font-family: var(--font-mono);
+  font-size: 0.68rem;
+  color: var(--text-muted);
+}
+
+.rc-interpretation {
+  font-size: 0.82rem;
+  color: var(--text-secondary);
+  line-height: 1.5;
+}
+
+.rc-interp-label {
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.rc-formula {
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  color: var(--text-muted);
+  background: var(--bg-surface-2);
+  padding: var(--space-2) var(--space-3);
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border-color-light);
+}
+
+@media (max-width: 480px) {
+  .rc-value { font-size: 1.6rem; }
+}

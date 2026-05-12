@@ -1,0 +1,109 @@
+/* EpiCalc Design System */
+@import url('https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Mono:wght@400;500&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,300&display=swap');
+
+:root {
+  /* Brand Colors */
+  --color-primary: #1a6b4a;
+  --color-primary-light: #2d9068;
+  --color-primary-dark: #0f4a32;
+  --color-accent: #e8a020;
+  --color-accent-light: #f0bb55;
+  --color-danger: #c0392b;
+  --color-danger-light: #e74c3c;
+  --color-info: #2471a3;
+  --color-info-light: #3498db;
+
+  /* Light Mode */
+  --bg-base: #f4f7f4;
+  --bg-surface: #ffffff;
+  --bg-surface-2: #f0f4f0;
+  --bg-surface-3: #e8ede8;
+  --border-color: #d0dbd0;
+  --border-color-light: #e4ece4;
+  --text-primary: #1a2e1a;
+  --text-secondary: #4a624a;
+  --text-muted: #7a927a;
+  --text-on-primary: #ffffff;
+
+  /* Shadows */
+  --shadow-sm: 0 1px 3px rgba(26, 46, 26, 0.08);
+  --shadow-md: 0 4px 12px rgba(26, 46, 26, 0.10);
+  --shadow-lg: 0 8px 24px rgba(26, 46, 26, 0.12);
+  --shadow-focus: 0 0 0 3px rgba(26, 107, 74, 0.25);
+
+  /* Typography */
+  --font-display: 'DM Serif Display', Georgia, serif;
+  --font-body: 'DM Sans', system-ui, sans-serif;
+  --font-mono: 'DM Mono', 'Courier New', monospace;
+
+  /* Spacing */
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 20px;
+  --space-6: 24px;
+  --space-8: 32px;
+  --space-10: 40px;
+  --space-12: 48px;
+
+  /* Radius */
+  --radius-sm: 6px;
+  --radius-md: 10px;
+  --radius-lg: 16px;
+  --radius-xl: 24px;
+
+  /* Transitions */
+  --transition-fast: 150ms ease;
+  --transition-base: 250ms ease;
+  --transition-slow: 400ms ease;
+
+  /* Chart colors */
+  --chart-susceptible: #3498db;
+  --chart-infectious: #e74c3c;
+  --chart-recovered: #2ecc71;
+  --chart-exposed: #f39c12;
+}
+
+[data-theme="dark"] {
+  --bg-base: #0f1a0f;
+  --bg-surface: #182018;
+  --bg-surface-2: #1e2a1e;
+  --bg-surface-3: #243024;
+  --border-color: #2a3d2a;
+  --border-color-light: #233023;
+  --text-primary: #e8f0e8;
+  --text-secondary: #a8c0a8;
+  --text-muted: #6a856a;
+  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.3);
+  --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.4);
+  --shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.5);
+  --shadow-focus: 0 0 0 3px rgba(45, 144, 104, 0.35);
+  --color-primary: #2d9068;
+  --color-primary-light: #3ab87f;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  font-size: 16px;
+  -webkit-font-smoothing: antialiased;
+}
+
+body {
+  font-family: var(--font-body);
+  background-color: var(--bg-base);
+  color: var(--text-primary);
+  line-height: 1.6;
+  transition: background-color var(--transition-base), color var(--transition-base);
+}
+
+/* Scrollbar */
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: var(--bg-surface-2); }
+::-webkit-scrollbar-thumb { background: var(--border-color); border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: var(--text-muted); }
