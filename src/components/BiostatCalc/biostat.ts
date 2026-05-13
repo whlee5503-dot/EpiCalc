@@ -282,6 +282,119 @@ export function calcChiSquareCurve(chi2: number, df: number): ChiCurveResult {
   return { data, xMax, xcrit };
 }
 
+// ─── Standard Normal PDF ────────────────────────────────────────────────────
+export function normalPDF(z: number): number {
+  return Math.exp(-0.5 * z * z) * 0.3989422804014327;
+}
+
+// ─── Z-Test ──────────────────────────────────────────────────────────────────
+export interface ZTestResult {
+  z: number;
+  pValue: number;
+  meanDiff: number;
+  ciLow: number;
+  ciHigh: number;
+  se: number;
+  significant: boolean;
+  valid: boolean;
+}
+
+export function calcZTestOneSample(
+  xbar: number, mu0: number, sigma: number, n: number,
+): ZTestResult {
+  const fail: ZTestResult = { z: 0, pValue: 1, meanDiff: 0, ciLow: 0, ciHigh: 0, se: 0, significant: false, valid: false };
+  if ([xbar, mu0, sigma, n].some(isNaN) || n < 1 || sigma <= 0) return fail;
+  const se = sigma / Math.sqrt(n);
+  const meanDiff = xbar - mu0;
+  const z = meanDiff / se;
+  const pValue = 2 * (1 - normalCDF(Math.abs(z)));
+  return { z, pValue, meanDiff, se, ciLow: meanDiff - 1.96 * se, ciHigh: meanDiff + 1.96 * se, significant: pValue < 0.05, valid: true };
+}
+
+export function calcZTestTwoSample(
+  mean1: number, sigma1: number, n1: number,
+  mean2: number, sigma2: number, n2: number,
+): ZTestResult {
+  const fail: ZTestResult = { z: 0, pValue: 1, meanDiff: 0, ciLow: 0, ciHigh: 0, se: 0, significant: false, valid: false };
+  if ([mean1, sigma1, n1, mean2, sigma2, n2].some(isNaN) || n1 < 1 || n2 < 1 || sigma1 <= 0 || sigma2 <= 0) return fail;
+  const se = Math.sqrt(sigma1 * sigma1 / n1 + sigma2 * sigma2 / n2);
+  const meanDiff = mean1 - mean2;
+  const z = meanDiff / se;
+  const pValue = 2 * (1 - normalCDF(Math.abs(z)));
+  return { z, pValue, meanDiff, se, ciLow: meanDiff - 1.96 * se, ciHigh: meanDiff + 1.96 * se, significant: pValue < 0.05, valid: true };
+}
+
+// ─── Standard Normal curve for visualization ─────────────────────────────────
+export interface ZDistPoint { z: number; pdf: number; body: number; tail: number }
+export interface ZDistCurveResult { data: ZDistPoint[]; zRange: number; zcrit: number }
+
+export function calcZDistCurve(zStat: number): ZDistCurveResult {
+  const zcrit = 1.96;
+  const zRange = Math.min(Math.max(Math.abs(zStat) + 1.5, 3.5), 6);
+  const numPts = 300;
+  const step = (2 * zRange) / numPts;
+  const data: ZDistPoint[] = Array.from({ length: numPts + 1 }, (_, i) => {
+    const z = -zRange + i * step;
+    const pdf = normalPDF(z);
+    const inTail = Math.abs(z) >= zcrit;
+    return { z: parseFloat(z.toFixed(4)), pdf, body: inTail ? 0 : pdf, tail: inTail ? pdf : 0 };
+  });
+  return { data, zRange, zcrit };
+}
+
+// ─── F-distribution p-value (via regularized incomplete beta) ─────────────────
+export function fPValue(f: number, df1: number, df2: number): number {
+  if (f <= 0) return 1;
+  const x = (df1 * f) / (df1 * f + df2);
+  return 1 - betaReg(x, df1 / 2, df2 / 2);
+}
+
+// ─── One-Way ANOVA ───────────────────────────────────────────────────────────
+export interface ANOVAGroup { name: string; values: number[] }
+
+export interface ANOVAGroupStats { name: string; n: number; mean: number; sd: number; values: number[] }
+
+export interface ANOVAResult {
+  f: number;
+  dfBetween: number;
+  dfWithin: number;
+  ssBetween: number;
+  ssWithin: number;
+  ssTotal: number;
+  msBetween: number;
+  msWithin: number;
+  pValue: number;
+  significant: boolean;
+  groups: ANOVAGroupStats[];
+  valid: boolean;
+}
+
+export function calcANOVA(groups: ANOVAGroup[]): ANOVAResult {
+  const fail: ANOVAResult = { f: 0, dfBetween: 0, dfWithin: 0, ssBetween: 0, ssWithin: 0, ssTotal: 0, msBetween: 0, msWithin: 0, pValue: 1, significant: false, groups: [], valid: false };
+  const valid = groups.filter(g => g.values.length >= 2);
+  if (valid.length < 2) return fail;
+  const k = valid.length;
+  const N = valid.reduce((s, g) => s + g.values.length, 0);
+  const grandMean = valid.flatMap(g => g.values).reduce((a, b) => a + b, 0) / N;
+  const groupStats: ANOVAGroupStats[] = valid.map(g => {
+    const n = g.values.length;
+    const mean = g.values.reduce((a, b) => a + b, 0) / n;
+    const sd = Math.sqrt(g.values.reduce((s, v) => s + (v - mean) ** 2, 0) / (n - 1));
+    return { name: g.name, n, mean, sd, values: g.values };
+  });
+  const ssBetween = groupStats.reduce((s, g) => s + g.n * (g.mean - grandMean) ** 2, 0);
+  const ssWithin = groupStats.reduce((s, g) => s + g.values.reduce((sv, v) => sv + (v - g.mean) ** 2, 0), 0);
+  const ssTotal = ssBetween + ssWithin;
+  const dfBetween = k - 1;
+  const dfWithin = N - k;
+  const msBetween = ssBetween / dfBetween;
+  const msWithin = ssWithin / dfWithin;
+  if (msWithin <= 0) return fail;
+  const f = msBetween / msWithin;
+  const pValue = fPValue(f, dfBetween, dfWithin);
+  return { f, dfBetween, dfWithin, ssBetween, ssWithin, ssTotal, msBetween, msWithin, pValue, significant: pValue < 0.05, groups: groupStats, valid: true };
+}
+
 // ─── t-distribution curve for visualization ──────────────────────────────────
 export interface TDistPoint { t: number; pdf: number; body: number; tail: number }
 export interface TDistCurveResult { data: TDistPoint[]; tRange: number; tcrit: number }

@@ -551,6 +551,61 @@
   cursor: not-allowed;
 }
 
+/* ── ANOVA Summary Table ── */
+.anova-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-family: var(--font-mono);
+  font-size: 0.82rem;
+}
+
+.anova-table th {
+  padding: var(--space-2) var(--space-3);
+  text-align: left;
+  color: var(--text-muted);
+  font-weight: 700;
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.anova-table td {
+  padding: var(--space-2) var(--space-3);
+  color: var(--text-secondary);
+  border-bottom: 1px solid var(--border-color-light);
+}
+
+.anova-table__source {
+  font-family: var(--font-body);
+  font-weight: 600;
+  color: var(--text-primary) !important;
+}
+
+.anova-table__total-row td {
+  border-bottom: none;
+  font-weight: 600;
+  color: var(--text-primary) !important;
+}
+
+/* ── ANOVA Pro hint card ── */
+.anova-pro-card {
+  border-style: dashed;
+  opacity: 0.8;
+}
+
+.anova-pro-badge {
+  padding: var(--space-1) var(--space-3);
+  background: var(--color-primary);
+  color: var(--text-on-primary);
+  border-radius: var(--radius-sm);
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  flex-shrink: 0;
+  font-family: var(--font-body);
+}
+
 /* ── Responsive ── */
 @media (max-width: 960px) {
   .bs-layout {
@@ -567,10 +622,12 @@
   }
   .bs-subtab-bar {
     width: 100%;
+    flex-wrap: wrap;
   }
   .bs-subtab-btn {
-    flex: 1;
+    flex: 1 1 auto;
     text-align: center;
+    min-width: max-content;
   }
   .bs-stats-grid {
     grid-template-columns: 1fr 1fr;

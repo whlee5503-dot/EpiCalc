@@ -4,11 +4,13 @@ import { translations } from '../../i18n/translations';
 import SampleSize from './SampleSize';
 import TTest from './TTest';
 import ChiSquare from './ChiSquare';
+import ZTest from './ZTest';
+import ANOVA from './ANOVA';
 import './BiostatCalc.css';
 
 interface Props { lang: Lang }
 
-type SubTab = 'samplesize' | 'ttest' | 'chisquare';
+type SubTab = 'samplesize' | 'ttest' | 'chisquare' | 'ztest' | 'anova';
 
 const BiostatCalc: React.FC<Props> = ({ lang }) => {
   const [subTab, setSubTab] = useState<SubTab>('samplesize');
@@ -40,11 +42,25 @@ const BiostatCalc: React.FC<Props> = ({ lang }) => {
         >
           {ts.tabChiSquare}
         </button>
+        <button
+          className={`bs-subtab-btn${subTab === 'ztest' ? ' active' : ''}`}
+          onClick={() => setSubTab('ztest')}
+        >
+          {ts.tabZTest}
+        </button>
+        <button
+          className={`bs-subtab-btn${subTab === 'anova' ? ' active' : ''}`}
+          onClick={() => setSubTab('anova')}
+        >
+          {ts.tabANOVA}
+        </button>
       </div>
 
       {subTab === 'samplesize' && <SampleSize lang={lang} />}
       {subTab === 'ttest' && <TTest lang={lang} />}
       {subTab === 'chisquare' && <ChiSquare lang={lang} />}
+      {subTab === 'ztest' && <ZTest lang={lang} />}
+      {subTab === 'anova' && <ANOVA lang={lang} />}
     </div>
   );
 };
