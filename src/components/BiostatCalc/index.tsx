@@ -31,6 +31,12 @@ const BiostatCalc: React.FC<Props> = ({ lang }) => {
           {ts.tabSampleSize}
         </button>
         <button
+          className={`bs-subtab-btn${subTab === 'ztest' ? ' active' : ''}`}
+          onClick={() => setSubTab('ztest')}
+        >
+          {ts.tabZTest}
+        </button>
+        <button
           className={`bs-subtab-btn${subTab === 'ttest' ? ' active' : ''}`}
           onClick={() => setSubTab('ttest')}
         >
@@ -43,12 +49,6 @@ const BiostatCalc: React.FC<Props> = ({ lang }) => {
           {ts.tabChiSquare}
         </button>
         <button
-          className={`bs-subtab-btn${subTab === 'ztest' ? ' active' : ''}`}
-          onClick={() => setSubTab('ztest')}
-        >
-          {ts.tabZTest}
-        </button>
-        <button
           className={`bs-subtab-btn${subTab === 'anova' ? ' active' : ''}`}
           onClick={() => setSubTab('anova')}
         >
@@ -57,9 +57,9 @@ const BiostatCalc: React.FC<Props> = ({ lang }) => {
       </div>
 
       {subTab === 'samplesize' && <SampleSize lang={lang} />}
+      {subTab === 'ztest' && <ZTest lang={lang} />}
       {subTab === 'ttest' && <TTest lang={lang} />}
       {subTab === 'chisquare' && <ChiSquare lang={lang} />}
-      {subTab === 'ztest' && <ZTest lang={lang} />}
       {subTab === 'anova' && <ANOVA lang={lang} />}
     </div>
   );

@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import Header from './components/Header';
-import EpiCalculator from './components/EpiCalculator';
+import EpiCalculator from './components/EpiCalculator/index';
 import ScreeningCalc from './components/ScreeningCalc';
 import SIRSimulator from './components/SIRSimulator/SIRSimulator';
 import BiostatCalc from './components/BiostatCalc';
