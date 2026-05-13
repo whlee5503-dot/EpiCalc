@@ -3,11 +3,12 @@ import Header from './components/Header';
 import EpiCalculator from './components/EpiCalculator';
 import ScreeningCalc from './components/ScreeningCalc';
 import SIRSimulator from './components/SIRSimulator/SIRSimulator';
+import BiostatCalc from './components/BiostatCalc';
 import type { Lang } from './i18n/translations';
 import './styles/variables.css';
 import './App.css';
 
-type Tab = 'epi' | 'screening' | 'sir';
+type Tab = 'epi' | 'screening' | 'sir' | 'biostat';
 type Theme = 'light' | 'dark';
 
 function App() {
@@ -58,6 +59,7 @@ function App() {
         {tab === 'epi' && <EpiCalculator lang={lang} />}
         {tab === 'screening' && <ScreeningCalc lang={lang} />}
         {tab === 'sir' && <SIRSimulator lang={lang} />}
+        {tab === 'biostat' && <BiostatCalc lang={lang} />}
       </main>
       <footer className="app-footer">
         <div className="footer-inner">

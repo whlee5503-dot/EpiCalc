@@ -54,7 +54,7 @@ const Header: React.FC<HeaderProps> = ({
         </div>
 
         <nav className="header-nav">
-          {(['epi', 'screening', 'sir'] as const).map((tab) => (
+          {(['epi', 'screening', 'sir', 'biostat'] as const).map((tab) => (
             <button
               key={tab}
               className={`nav-tab ${activeTab === tab ? 'active' : ''}`}

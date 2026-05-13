@@ -1,0 +1,587 @@
+.bs-calc {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: var(--space-8) var(--space-6);
+  animation: fadeUp 0.4s ease both;
+}
+
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(16px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* ── Sub-tab bar ── */
+.bs-subtab-bar {
+  display: flex;
+  gap: var(--space-2);
+  background: var(--bg-surface);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  padding: var(--space-1);
+  width: fit-content;
+  margin-bottom: var(--space-8);
+}
+
+.bs-subtab-btn {
+  padding: var(--space-2) var(--space-5);
+  border-radius: calc(var(--radius-md) - 2px);
+  font-family: var(--font-body);
+  font-size: 0.875rem;
+  font-weight: 500;
+  cursor: pointer;
+  border: none;
+  background: transparent;
+  color: var(--text-muted);
+  transition: all var(--transition-fast);
+  white-space: nowrap;
+}
+
+.bs-subtab-btn:hover:not(.active) {
+  color: var(--text-primary);
+  background: var(--bg-surface-2);
+}
+
+.bs-subtab-btn.active {
+  background: var(--color-primary);
+  color: var(--text-on-primary);
+  font-weight: 600;
+}
+
+/* ── Two-column layout (shared by both sub-tabs) ── */
+.bs-layout {
+  display: grid;
+  grid-template-columns: 340px 1fr;
+  gap: var(--space-8);
+  align-items: start;
+}
+
+.bs-left {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-5);
+  position: sticky;
+  top: 80px;
+}
+
+.bs-right {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-5);
+}
+
+/* ── Input panel ── */
+.bs-input-panel {
+  background: var(--bg-surface);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  padding: var(--space-4) var(--space-5);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+.bs-input-group {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+}
+
+.bs-label {
+  font-size: 0.82rem;
+  font-weight: 500;
+  color: var(--text-secondary);
+}
+
+.bs-number-input {
+  width: 100%;
+  padding: var(--space-2) var(--space-3);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-sm);
+  background: var(--bg-surface-2);
+  color: var(--text-primary);
+  font-family: var(--font-mono);
+  font-size: 0.9rem;
+  transition: border-color var(--transition-fast), box-shadow var(--transition-fast);
+}
+
+.bs-number-input:focus {
+  outline: none;
+  border-color: var(--color-primary);
+  box-shadow: var(--shadow-focus);
+}
+
+.bs-select {
+  width: 100%;
+  padding: var(--space-2) var(--space-3);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-sm);
+  background: var(--bg-surface-2);
+  color: var(--text-primary);
+  font-family: var(--font-body);
+  font-size: 0.875rem;
+  cursor: pointer;
+  transition: border-color var(--transition-fast), box-shadow var(--transition-fast);
+}
+
+.bs-select:focus {
+  outline: none;
+  border-color: var(--color-primary);
+  box-shadow: var(--shadow-focus);
+}
+
+/* ── Group card (t-test) ── */
+.bs-group-card {
+  background: var(--bg-surface);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  padding: var(--space-4) var(--space-5);
+}
+
+.bs-group-title {
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--color-primary);
+  margin-bottom: var(--space-3);
+}
+
+.bs-group-grid {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+/* ── Stats grid ── */
+.bs-stats-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-4);
+}
+
+.bs-stat-card {
+  background: var(--bg-surface);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  padding: var(--space-4) var(--space-5);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  transition: box-shadow var(--transition-fast);
+}
+
+.bs-stat-card:hover {
+  box-shadow: var(--shadow-md);
+}
+
+.bs-stat-label {
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--text-muted);
+}
+
+.bs-stat-value {
+  font-family: var(--font-mono);
+  font-size: 1.8rem;
+  font-weight: 500;
+  color: var(--text-primary);
+  line-height: 1.1;
+}
+
+.bs-stat-sub {
+  font-size: 0.72rem;
+  color: var(--text-muted);
+  font-family: var(--font-mono);
+}
+
+/* ── Significance badge ── */
+.bs-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-3) var(--space-5);
+  border-radius: var(--radius-md);
+  font-size: 0.875rem;
+  font-weight: 600;
+  border: 1px solid;
+}
+
+.bs-badge--sig {
+  background: color-mix(in srgb, var(--color-primary) 10%, transparent);
+  color: var(--color-primary);
+  border-color: color-mix(in srgb, var(--color-primary) 30%, transparent);
+}
+
+.bs-badge--ns {
+  background: color-mix(in srgb, var(--text-muted) 10%, transparent);
+  color: var(--text-muted);
+  border-color: var(--border-color);
+}
+
+/* ── CI card ── */
+.bs-ci-card {
+  display: flex;
+  align-items: center;
+  gap: var(--space-4);
+  background: var(--bg-surface);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  padding: var(--space-4) var(--space-5);
+  flex-wrap: wrap;
+}
+
+.bs-ci-label {
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--text-muted);
+  flex-shrink: 0;
+}
+
+.bs-ci-value {
+  font-family: var(--font-mono);
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.bs-ci-hint {
+  font-size: 0.78rem;
+  color: var(--text-muted);
+  margin-left: auto;
+}
+
+/* ── Chart card ── */
+.bs-chart-card {
+  background: var(--bg-surface);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  padding: var(--space-5) var(--space-5) var(--space-4);
+}
+
+.bs-chart-header {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  margin-bottom: var(--space-4);
+  gap: var(--space-3);
+  flex-wrap: wrap;
+}
+
+.bs-chart-title {
+  font-family: var(--font-display);
+  font-size: 1.1rem;
+  font-weight: 400;
+  color: var(--text-primary);
+  letter-spacing: -0.02em;
+}
+
+.bs-chart-sub {
+  font-size: 0.78rem;
+  color: var(--text-muted);
+  font-family: var(--font-mono);
+}
+
+/* ── Legend row (t-distribution chart) ── */
+.bs-legend-row {
+  display: flex;
+  gap: var(--space-5);
+  margin-bottom: var(--space-3);
+  flex-wrap: wrap;
+}
+
+.bs-legend-item {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  font-size: 0.75rem;
+  color: var(--text-muted);
+}
+
+.bs-legend-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 2px;
+  flex-shrink: 0;
+}
+
+.bs-legend-line {
+  width: 18px;
+  height: 3px;
+  border-radius: 2px;
+  flex-shrink: 0;
+}
+
+/* ── Empty state ── */
+.bs-empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-4);
+  padding: var(--space-12);
+  background: var(--bg-surface);
+  border: 1px dashed var(--border-color);
+  border-radius: var(--radius-md);
+  color: var(--text-muted);
+}
+
+.bs-empty-icon {
+  font-family: var(--font-mono);
+  font-size: 2.5rem;
+  opacity: 0.4;
+}
+
+.bs-empty-text {
+  font-size: 0.875rem;
+  text-align: center;
+}
+
+/* ── Warning box ── */
+.bs-warning {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-3);
+  padding: var(--space-3) var(--space-4);
+  background: color-mix(in srgb, var(--color-accent) 10%, transparent);
+  border: 1px solid color-mix(in srgb, var(--color-accent) 35%, transparent);
+  border-radius: var(--radius-md);
+  font-size: 0.82rem;
+  color: var(--color-accent);
+  line-height: 1.5;
+}
+
+.bs-warning-icon {
+  flex-shrink: 0;
+  font-size: 0.95rem;
+}
+
+/* ── Contingency Table ── */
+.bs-chitbl-wrap {
+  background: var(--bg-surface);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  padding: var(--space-4) var(--space-5);
+  overflow-x: auto;
+}
+
+.bs-tbl-toggle {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  margin-bottom: var(--space-3);
+}
+
+.bs-tbl-toggle-label {
+  display: none; /* used as sr-only if needed */
+}
+
+.bs-tbl-view-btn {
+  padding: var(--space-1) var(--space-3);
+  border-radius: var(--radius-sm);
+  font-family: var(--font-body);
+  font-size: 0.75rem;
+  font-weight: 500;
+  cursor: pointer;
+  border: 1px solid var(--border-color);
+  background: transparent;
+  color: var(--text-muted);
+  transition: all var(--transition-fast);
+}
+
+.bs-tbl-view-btn:hover:not(.active):not(:disabled) {
+  background: var(--bg-surface-2);
+  color: var(--text-primary);
+}
+
+.bs-tbl-view-btn.active {
+  background: var(--bg-surface-3);
+  border-color: var(--color-primary);
+  color: var(--color-primary);
+  font-weight: 600;
+}
+
+.bs-tbl-view-btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+/* CSS Grid contingency table */
+.bs-chitbl {
+  display: grid;
+  gap: var(--space-1);
+  width: 100%;
+}
+
+.bs-chitbl-corner {
+  /* empty top-left cell */
+}
+
+.bs-chitbl-label-input {
+  width: 100%;
+  padding: var(--space-1) var(--space-2);
+  border: 1px solid var(--border-color-light);
+  border-radius: var(--radius-sm);
+  background: var(--bg-surface-2);
+  color: var(--text-primary);
+  font-family: var(--font-body);
+  font-size: 0.78rem;
+  font-weight: 600;
+  text-align: center;
+  transition: border-color var(--transition-fast);
+}
+
+.bs-chitbl-label-input:focus {
+  outline: none;
+  border-color: var(--color-primary);
+}
+
+.bs-chitbl-row-lbl {
+  text-align: left;
+  padding-left: var(--space-2);
+}
+
+.bs-chitbl-cell {
+  width: 100%;
+  padding: var(--space-2);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-sm);
+  background: var(--bg-surface-2);
+  color: var(--text-primary);
+  font-family: var(--font-mono);
+  font-size: 0.9rem;
+  text-align: center;
+  transition: border-color var(--transition-fast), box-shadow var(--transition-fast);
+}
+
+.bs-chitbl-cell:focus {
+  outline: none;
+  border-color: var(--color-primary);
+  box-shadow: var(--shadow-focus);
+}
+
+.bs-chitbl-exp {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-2);
+  font-family: var(--font-mono);
+  font-size: 0.88rem;
+  color: var(--text-secondary);
+  background: var(--bg-surface-2);
+  border: 1px solid var(--border-color-light);
+  border-radius: var(--radius-sm);
+}
+
+.bs-chitbl-exp--warn {
+  border-color: var(--color-accent);
+  color: var(--color-accent);
+  background: color-mix(in srgb, var(--color-accent) 8%, transparent);
+  font-weight: 600;
+}
+
+.bs-chitbl-total {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-mono);
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: var(--text-muted);
+  padding: var(--space-1);
+}
+
+.bs-chitbl-hdr {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--text-muted);
+  padding: var(--space-1);
+}
+
+.bs-chitbl-grand {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-mono);
+  font-size: 0.88rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  background: var(--bg-surface-3);
+  border-radius: var(--radius-sm);
+  padding: var(--space-1);
+}
+
+.bs-chitbl-controls {
+  display: flex;
+  gap: var(--space-2);
+  margin-top: var(--space-3);
+  flex-wrap: wrap;
+}
+
+.bs-tbl-btn {
+  padding: var(--space-1) var(--space-3);
+  border-radius: var(--radius-sm);
+  font-family: var(--font-body);
+  font-size: 0.75rem;
+  font-weight: 600;
+  cursor: pointer;
+  border: 1px solid var(--border-color);
+  background: var(--bg-surface-2);
+  color: var(--text-secondary);
+  transition: all var(--transition-fast);
+  white-space: nowrap;
+}
+
+.bs-tbl-btn:hover:not(:disabled) {
+  background: var(--bg-surface-3);
+  border-color: var(--color-primary);
+  color: var(--color-primary);
+}
+
+.bs-tbl-btn:disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+}
+
+/* ── Responsive ── */
+@media (max-width: 960px) {
+  .bs-layout {
+    grid-template-columns: 1fr;
+  }
+  .bs-left {
+    position: static;
+  }
+}
+
+@media (max-width: 600px) {
+  .bs-calc {
+    padding: var(--space-5) var(--space-4);
+  }
+  .bs-subtab-bar {
+    width: 100%;
+  }
+  .bs-subtab-btn {
+    flex: 1;
+    text-align: center;
+  }
+  .bs-stats-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+  .bs-stat-value {
+    font-size: 1.4rem;
+  }
+}
+
+@media (max-width: 400px) {
+  .bs-stats-grid {
+    grid-template-columns: 1fr;
+  }
+}
