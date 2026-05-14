@@ -3,6 +3,24 @@
 [![Live Demo](https://img.shields.io/badge/Live%20Demo-epi.chem--health--calc.com-brightgreen)](https://epi.chem-health-calc.com)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 [![Built with React](https://img.shields.io/badge/Built%20with-React%20%2B%20TypeScript-blue)](https://react.dev)
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.20181520.svg)](https://doi.org/10.5281/zenodo.20181520)
+
+---
+
+### 🌐 SDG Alignment
+EpiCalc contributes to the UN Sustainable 
+Development Goal 3 (Good Health and Well-being), 
+specifically Target 3.d: strengthening early 
+warning systems and risk reduction for national 
+and global health risks. By providing free, 
+offline-capable epidemiology and biostatistics 
+tools, EpiCalc supports evidence-based 
+decision-making for public health workers in 
+low-resource settings worldwide.
+
+[![SDG 3](https://img.shields.io/badge/SDG-3%20Good%20Health-brightgreen)](https://sdgs.un.org/goals/goal3)
+
+---
 
 A free, mobile-friendly, open-source web application for epidemiology metrics, epidemic simulation, and biostatistics — designed for MPH students, medical students, clinical researchers, and public health practitioners worldwide.
 
@@ -26,6 +44,12 @@ EpiCalc can be installed as a native-like app on your smartphone — no App Stor
 - **iPhone (Safari)**: Share (□↑) → "Add to Home Screen"
 
 Once installed, EpiCalc launches like a native app and supports offline use.
+
+EpiCalc is platform-independent — compatible 
+with Android, iOS, and any modern web browser. 
+Once installed, it operates fully offline, 
+suitable for areas with limited or no internet 
+connectivity.
 
 ---
 
@@ -74,6 +98,16 @@ EpiCalc is being developed with a dual mission:
 - **Low-resource settings**: Lightweight, offline-capable PWA — freely available to public health workers in sub-Saharan Africa, Southeast Asia, and other underserved regions
 
 We are actively exploring partnerships with organizations such as WHO, AFENET, and global health funders to support this mission.
+
+---
+
+## 🔒 Privacy & Data Policy
+EpiCalc does not collect, store, or transmit 
+any personally identifiable information (PII). 
+All calculations are performed entirely on the 
+client side (browser/device). No data is sent 
+to any external server. Safe for use in 
+sensitive public health contexts.
 
 ---
 
@@ -163,6 +197,9 @@ epicalc/
 ---
 
 ## 🤝 Contributing
+
+EpiCalc is designed in accordance with the 
+[Principles for Digital Development](https://digitalprinciples.org/).
 
 Contributions are welcome! This project is especially looking for:
 
