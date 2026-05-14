@@ -1,73 +1,205 @@
-# React + TypeScript + Vite
+# EpiCalc — Free Public Health Calculator
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+[![Live Demo](https://img.shields.io/badge/Live%20Demo-epi.chem--health--calc.com-brightgreen)](https://epi.chem-health-calc.com)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
+[![Built with React](https://img.shields.io/badge/Built%20with-React%20%2B%20TypeScript-blue)](https://react.dev)
 
-Currently, two official plugins are available:
+A free, mobile-friendly, open-source web application for epidemiology metrics, epidemic simulation, and biostatistics — designed for MPH students, medical students, clinical researchers, and public health practitioners worldwide.
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+> 🌍 **Mission**: To make essential public health calculation tools freely accessible to health workers in low-resource settings, including offline use in areas with limited internet connectivity.
 
-## React Compiler
+---
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+## 🖥️ Live Demo
 
-## Expanding the ESLint configuration
+**[https://epi.chem-health-calc.com](https://epi.chem-health-calc.com)**
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+No login required. Works on mobile. Dark mode supported.
 
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
+---
 
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
+## 📱 Install as Mobile App (PWA)
 
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+EpiCalc can be installed as a native-like app on your smartphone — no App Store needed.
+
+- **Android (Chrome)**: Menu (⋮) → "Add to Home Screen"
+- **iPhone (Safari)**: Share (□↑) → "Add to Home Screen"
+
+Once installed, EpiCalc launches like a native app and supports offline use.
+
+---
+
+## ✨ Features
+
+### 📊 Epidemiology Metrics
+- **Risk Metrics** — Relative Risk (RR), Odds Ratio (OR), ARR, NNT with 95% CI visualization
+- **Disease Frequency** — Attack Rate, Secondary Attack Rate, CFR, Crude & Age-adjusted Mortality Rate
+- **Vaccine Efficacy** — VE, Herd Immunity Threshold (HIT), Number Needed to Vaccinate (NNV)
+- **Burden of Disease** — DALYs, YLL, YLD
+
+### 🔬 Screening Test Performance
+- Sensitivity, Specificity, PPV, NPV
+- Likelihood Ratios (LR+, LR−)
+- Interactive 2×2 test matrix
+
+### 🦠 Epidemic Simulator (SIR / SEIR)
+- Real-time R₀ visualization
+- Herd immunity threshold
+- Vaccination rate effect simulation
+- Peak day & total case estimation
+
+### 📈 Biostatistics Calculator
+- **Sample Size** — Two-proportion test with Power Curve
+- **Z-Test** — One/Two-sample with Normal distribution visualization
+- **Independent t-Test** — t-distribution with rejection region
+- **Chi-Square Test** — r×c contingency table with χ²-distribution
+- **ANOVA (F-Test)** — Group comparison with Summary Table
+
+---
+
+## 🎯 Target Users
+
+- MPH students & public health faculty
+- Medical students & clinical researchers
+- Epidemiologists & field health workers
+- Public health workers in low-resource settings (developing countries)
+
+---
+
+## 🌍 Global Health Vision
+
+EpiCalc is being developed with a dual mission:
+
+- **High-income settings**: Full-featured web app (free + optional Pro tier)
+- **Low-resource settings**: Lightweight, offline-capable PWA — freely available to public health workers in sub-Saharan Africa, Southeast Asia, and other underserved regions
+
+We are actively exploring partnerships with organizations such as WHO, AFENET, and global health funders to support this mission.
+
+---
+
+## 🛠️ Tech Stack
+
+| Category | Technology |
+|----------|-----------|
+| Frontend | React 18 + TypeScript |
+| Build Tool | Vite |
+| Charts | Recharts |
+| Styling | CSS Variables (Dark mode support) |
+| i18n | Korean / English toggle |
+| Deployment | Cloudflare Pages |
+| Dev Environment | Firebase Studio |
+
+---
+
+## 🚀 Getting Started
+
+```bash
+# Clone the repository
+git clone https://github.com/whlee5503-dot/EpiCalc.git
+cd EpiCalc
+
+# Install dependencies
+npm install
+
+# Start development server
+npm run dev
+
+# Build for production
+npm run build
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+---
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+## 📐 Mathematical Formulas
 
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+All calculations are based on standard epidemiological and statistical formulas:
+
 ```
+# Risk Metrics
+RR = [a/(a+b)] / [c/(c+d)]
+OR = (a×d) / (b×c)
+95% CI for RR = exp(ln(RR) ± 1.96 × √(1/a - 1/(a+b) + 1/c - 1/(c+d)))
+
+# SIR Model
+dS/dt = -β×S×I/N
+dI/dt = β×S×I/N - γ×I
+dR/dt = γ×I
+R₀ = β/γ
+
+# Sample Size (Two-proportion)
+n = (Zα/2 + Zβ)² × [p1(1-p1) + p2(1-p2)] / (p1-p2)²
+
+# Vaccine Efficacy
+VE = (1 - RR) × 100
+HIT = 1 - (1/R₀)
+
+# DALYs
+DALY = YLL + YLD
+YLL = deaths × remaining life expectancy
+YLD = cases × disability weight × duration
+```
+
+---
+
+## 📁 Project Structure
+
+```
+epicalc/
+├── src/
+│   ├── components/
+│   │   ├── EpiCalculator/     # Epidemiology metrics
+│   │   ├── Screening/         # Screening test performance
+│   │   ├── SIRSimulator/      # SIR/SEIR epidemic simulator
+│   │   └── BiostatCalc/       # Biostatistics calculator
+│   ├── utils/
+│   │   └── epidemiology.ts    # Core calculation functions
+│   ├── styles/
+│   │   └── variables.css      # CSS variables (dark mode)
+│   └── i18n/                  # Korean/English translations
+├── public/
+└── index.html
+```
+
+---
+
+## 🤝 Contributing
+
+Contributions are welcome! This project is especially looking for:
+
+- **Translations** — Multiple languages planned (for global health reach)
+- **Formula validation** — Epidemiologists and biostatisticians welcome
+- **Mobile UX improvements** — For low-resource device optimization
+- **Bug reports & feature requests** — Via GitHub Issues
+
+Please read our contributing guidelines before submitting a PR.
+
+---
+
+## 📄 License
+
+This project is licensed under the **MIT License** — see the [LICENSE](LICENSE) file for details.
+
+Free to use, modify, and distribute — including for use in developing countries and resource-limited settings.
+
+---
+
+## 👨‍💻 About the Developer
+
+**Won Ho Lee, Ph.D.**
+- Chemical Engineering (PhD) | MPH | MDiv
+- Former MPH faculty — Biostatistics & Foundations of Public Health
+- University of Utah MPH Alumni
+
+EpiCalc was built out of a deep, enduring connection to public health — and a hope that essential tools should be accessible to every health worker, regardless of where they work.
+
+---
+
+## 📬 Feedback
+
+Found a bug or have a suggestion?
+- Use the **Feedback button** in the app
+- Open a [GitHub Issue](https://github.com/whlee5503-dot/EpiCalc/issues)
+
+---
+
+> *"Essential public health tools should be accessible to every health worker, regardless of where they work."*
