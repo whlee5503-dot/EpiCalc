@@ -4,6 +4,8 @@ import EpiCalculator from './components/EpiCalculator/index';
 import ScreeningCalc from './components/ScreeningCalc';
 import SIRSimulator from './components/SIRSimulator/SIRSimulator';
 import BiostatCalc from './components/BiostatCalc';
+import AddToHomeScreen from './components/common/AddToHomeScreen';
+import FeedbackButton from './components/common/FeedbackButton';
 import type { Lang } from './i18n/translations';
 import './styles/variables.css';
 import './App.css';
@@ -68,6 +70,8 @@ function App() {
           <span>Public Health Calculator</span>
         </div>
       </footer>
+      <AddToHomeScreen lang={lang} />
+      <FeedbackButton lang={lang} />
     </div>
   );
 }
