@@ -5,6 +5,17 @@
 [![Built with React](https://img.shields.io/badge/Built%20with-React%20%2B%20TypeScript-blue)](https://react.dev)
 [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.20181520.svg)](https://doi.org/10.5281/zenodo.20181520)
 
+## 📢 Status
+
+- **Digital Public Goods (DPG):**
+  Currently under official review by the
+  [Digital Public Goods Alliance (DPGA)](https://digitalpublicgoods.net)
+  — Application ID: GID0093635
+
+- **Academic Citation:**
+  Formally citable via Zenodo DOI:
+  [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.20181520.svg)](https://doi.org/10.5281/zenodo.20181520)
+
 ---
 
 ### 🌐 SDG Alignment
