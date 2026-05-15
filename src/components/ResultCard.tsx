@@ -1,11 +1,15 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { type EpiResult, fmtNum, fmtPct, fmtCI } from '../utils/epidemiology';
+import type { InterpretationResult } from '../utils/interpretation';
+import type { Lang } from '../i18n/translations';
+import { translations } from '../i18n/translations';
 import './ResultCard.css';
 
 interface ResultCardProps {
   result: EpiResult | null;
   ciLabel: string;
-  interpretLabel: string;
+  interp?: InterpretationResult;
+  lang?: Lang;
   formatAs?: 'number' | 'percent';
   accentColor?: string;
   formulaHint?: string;
@@ -15,12 +19,16 @@ interface ResultCardProps {
 const ResultCard: React.FC<ResultCardProps> = ({
   result,
   ciLabel,
-  interpretLabel,
+  interp,
+  lang = 'en',
   formatAs = 'number',
   accentColor,
   formulaHint,
   undefinedLabel = '—',
 }) => {
+  const [expanded, setExpanded] = useState(false);
+  const tc = translations[lang].common;
+
   if (!result) {
     return (
       <div className="result-card result-card--undefined">
@@ -64,10 +72,24 @@ const ResultCard: React.FC<ResultCardProps> = ({
         </div>
       </div>
 
-      <div className="rc-interpretation">
-        <span className="rc-interp-label">{interpretLabel}:</span>
-        {' '}{result.interpretation}
-      </div>
+      {interp && (
+        <div className="rc-interpretation">
+          <div className="rc-summary">{interp.summary}</div>
+          <button
+            className="rc-toggle-btn"
+            onClick={() => setExpanded(e => !e)}
+            aria-expanded={expanded}
+          >
+            {expanded ? tc.showLess : tc.showMore}
+          </button>
+          <div className={`rc-interp-detail${expanded ? ' rc-interp-detail--open' : ''}`}>
+            <div className="rc-interp-detail-inner">
+              <div className="rc-footnote">{interp.footnote}</div>
+              <div className="rc-disclaimer">{interp.disclaimer}</div>
+            </div>
+          </div>
+        </div>
+      )}
 
       {formulaHint && <div className="rc-formula">{formulaHint}</div>}
     </div>

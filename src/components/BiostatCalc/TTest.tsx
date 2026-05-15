@@ -180,7 +180,7 @@ const TTest: React.FC<Props> = ({ lang }) => {
                 [{result.ciLow.toFixed(3)},&nbsp;{result.ciHigh.toFixed(3)}]
               </span>
               <span className="bs-ci-hint">
-                {result.ciLow > 0 || result.ciHigh < 0 ? '✓ excludes 0' : '✗ includes 0'}
+                {result.ciLow > 0 || result.ciHigh < 0 ? ts.ciExcludes0 : ts.ciIncludes0}
               </span>
             </div>
 

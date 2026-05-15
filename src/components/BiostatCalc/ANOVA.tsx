@@ -182,14 +182,14 @@ const ANOVA: React.FC<Props> = ({ lang }) => {
             {/* ANOVA Summary Table */}
             <div className="bs-chart-card">
               <div className="bs-chart-header">
-                <h2 className="bs-chart-title">ANOVA Summary</h2>
+                <h2 className="bs-chart-title">{ts.anovaSummaryTitle}</h2>
               </div>
               <div style={{ overflowX: 'auto' }}>
                 <table className="anova-table">
                   <thead>
                     <tr>
-                      {['Source', 'SS', 'df', 'MS', 'F', 'p-value'].map(h => (
-                        <th key={h}>{h}</th>
+                      {[ts.anovaSourceCol, 'SS', 'df', 'MS', 'F', ts.annovaPValueCol].map((h, i) => (
+                        <th key={i}>{h}</th>
                       ))}
                     </tr>
                   </thead>

@@ -163,6 +163,11 @@ export const translations = {
       anovaPostHocTitle: 'Post-Hoc Tests',
       anovaPostHocHint: 'Upgrade to Pro for Tukey & Bonferroni post-hoc tests',
       anovaProBadge: 'PRO',
+      anovaSummaryTitle: 'ANOVA Summary',
+      anovaSourceCol: 'Source',
+      annovaPValueCol: 'P-value',
+      ciExcludes0: '✓ excludes 0',
+      ciIncludes0: '✗ includes 0',
       // Common
       loadExample: 'Load Example',
       reset: 'Reset',
@@ -268,6 +273,8 @@ export const translations = {
       formula: 'Formula',
       note: 'Note',
       undefined: 'Undefined',
+      showMore: 'Show more ↓',
+      showLess: 'Show less ↑',
     },
   },
   ko: {
@@ -431,6 +438,11 @@ export const translations = {
       anovaPostHocTitle: '사후 검정',
       anovaPostHocHint: 'Tukey, Bonferroni 사후 검정은 Pro 버전에서 이용 가능합니다',
       anovaProBadge: 'PRO',
+      anovaSummaryTitle: 'ANOVA 요약',
+      anovaSourceCol: '출처',
+      annovaPValueCol: 'P-값',
+      ciExcludes0: '✓ 0 미포함',
+      ciIncludes0: '✗ 0 포함',
       // Common
       loadExample: '예제 불러오기',
       reset: '초기화',
@@ -524,6 +536,8 @@ export const translations = {
       formula: '공식',
       note: '참고',
       undefined: '정의 불가',
+      showMore: '자세히 보기 ↓',
+      showLess: '접기 ↑',
     },
   },
 } as const;

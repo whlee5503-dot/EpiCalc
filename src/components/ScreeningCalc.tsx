@@ -3,6 +3,8 @@ import type { TwoByTwoTable } from '../utils/epidemiology';
 import { calcScreening, fmtPct } from '../utils/epidemiology';
 import type { Lang } from '../i18n/translations';
 import { translations } from '../i18n/translations';
+import { interpretResult } from '../utils/interpretation';
+import type { InterpretationResult } from '../utils/interpretation';
 import TableInput from './TableInput';
 import './ScreeningCalc.css';
 
@@ -17,34 +19,60 @@ interface MetricBarProps {
   label: string;
   value: number;
   color: string;
-  interpretation: string;
+  description: string;
+  interp?: InterpretationResult;
+  lang: Lang;
   ciLow: number;
   ciHigh: number;
 }
 
-const MetricBar: React.FC<MetricBarProps> = ({ label, value, color, interpretation, ciLow, ciHigh }) => (
-  <div className="metric-bar-row">
-    <div className="mb-header">
-      <span className="mb-label">{label}</span>
-      <span className="mb-value" style={{ color }}>{fmtPct(value)}</span>
+const MetricBar: React.FC<MetricBarProps> = ({ label, value, color, description, interp, lang, ciLow, ciHigh }) => {
+  const [expanded, setExpanded] = useState(false);
+  const tc = translations[lang].common;
+
+  return (
+    <div className="metric-bar-row">
+      <div className="mb-header">
+        <span className="mb-label">{label}</span>
+        <span className="mb-value" style={{ color }}>{fmtPct(value)}</span>
+      </div>
+      <div className="mb-bar-track">
+        <div
+          className="mb-bar-fill"
+          style={{ width: `${value * 100}%`, background: color }}
+        />
+        <div
+          className="mb-ci-lower"
+          style={{ left: `${ciLow * 100}%` }}
+        />
+        <div
+          className="mb-ci-upper"
+          style={{ left: `${ciHigh * 100}%` }}
+        />
+      </div>
+      <div className="mb-interpretation">
+        <div className="mb-description">{description}</div>
+        {interp && (
+          <>
+            <button
+              className="mb-toggle-btn"
+              onClick={() => setExpanded(e => !e)}
+              aria-expanded={expanded}
+            >
+              {expanded ? tc.showLess : tc.showMore}
+            </button>
+            <div className={`mb-interp-detail${expanded ? ' mb-interp-detail--open' : ''}`}>
+              <div className="mb-interp-detail-inner">
+                <div className="mb-footnote">{interp.footnote}</div>
+                <div className="mb-disclaimer">{interp.disclaimer}</div>
+              </div>
+            </div>
+          </>
+        )}
+      </div>
     </div>
-    <div className="mb-bar-track">
-      <div
-        className="mb-bar-fill"
-        style={{ width: `${value * 100}%`, background: color }}
-      />
-      <div
-        className="mb-ci-lower"
-        style={{ left: `${ciLow * 100}%` }}
-      />
-      <div
-        className="mb-ci-upper"
-        style={{ left: `${ciHigh * 100}%` }}
-      />
-    </div>
-    <div className="mb-interpretation">{interpretation}</div>
-  </div>
-);
+  );
+};
 
 const ScreeningCalc: React.FC<ScreeningCalcProps> = ({ lang }) => {
   const [table, setTable] = useState<TwoByTwoTable>(EXAMPLE);
@@ -52,6 +80,42 @@ const ScreeningCalc: React.FC<ScreeningCalcProps> = ({ lang }) => {
   const ts = t.screening;
 
   const m = useMemo(() => calcScreening(table), [table]);
+
+  const v = (n: number) => (n * 100).toFixed(1);
+
+  const descriptions = useMemo(() => lang === 'ko' ? ({
+    sensitivity: `진양성의 ${v(m.sensitivity.value)}%를 감지합니다`,
+    specificity: `${v(m.specificity.value)}%의 음성을 정확히 배제합니다`,
+    ppv:         `양성 검사의 ${v(m.ppv.value)}%가 실제 질환입니다`,
+    npv:         `음성 검사의 ${v(m.npv.value)}%가 실제 비질환입니다`,
+    accuracy:    `전체 정확도: ${v(m.accuracy.value)}%`,
+  }) : ({
+    sensitivity: `Detects ${v(m.sensitivity.value)}% of true positives`,
+    specificity: `Correctly rules out ${v(m.specificity.value)}% of negatives`,
+    ppv:         `${v(m.ppv.value)}% of positive tests are true disease`,
+    npv:         `${v(m.npv.value)}% of negative tests are truly disease-free`,
+    accuracy:    `Overall correct classification: ${v(m.accuracy.value)}%`,
+  }), [m, lang]);
+
+  const interps = useMemo(() => ({
+    sensitivity: interpretResult('sensitivity', { value: m.sensitivity.value }, lang),
+    specificity: interpretResult('specificity', { value: m.specificity.value }, lang),
+    ppv:         interpretResult('PPV', { value: m.ppv.value }, lang),
+    npv:         interpretResult('NPV', { value: m.npv.value }, lang),
+  }), [m, lang]);
+
+  const lrInterps = useMemo(() => {
+    const lrPos = m.lrPositive.value;
+    const lrNeg = m.lrNegative.value;
+    if (lang === 'ko') return {
+      positive: lrPos > 10 ? '질환에 대한 강한 근거' : lrPos > 5 ? '중간 수준의 근거' : '약한 근거',
+      negative: lrNeg < 0.1 ? '질환 없음에 대한 강한 근거' : lrNeg < 0.2 ? '질환 없음에 대한 중간 근거' : '약한 근거',
+    };
+    return {
+      positive: m.lrPositive.interpretation,
+      negative: m.lrNegative.interpretation,
+    };
+  }, [m, lang]);
 
   const tableLabels = {
     rowPos: ts.truePos,
@@ -112,14 +176,14 @@ const ScreeningCalc: React.FC<ScreeningCalcProps> = ({ lang }) => {
               <div className="lr-val" style={{ color: 'var(--color-primary)' }}>
                 {m.lrPositive.value.toFixed(2)}
               </div>
-              <div className="lr-interp">{m.lrPositive.interpretation}</div>
+              <div className="lr-interp">{lrInterps.positive}</div>
             </div>
             <div className="lr-card">
               <div className="lr-name">{ts.lrNeg}</div>
               <div className="lr-val" style={{ color: 'var(--color-danger)' }}>
                 {m.lrNegative.value.toFixed(2)}
               </div>
-              <div className="lr-interp">{m.lrNegative.interpretation}</div>
+              <div className="lr-interp">{lrInterps.negative}</div>
             </div>
           </div>
         </div>
@@ -133,7 +197,9 @@ const ScreeningCalc: React.FC<ScreeningCalcProps> = ({ lang }) => {
                 label={ts.sensitivity}
                 value={m.sensitivity.value}
                 color={COLORS.sensitivity}
-                interpretation={m.sensitivity.interpretation}
+                description={descriptions.sensitivity}
+                interp={interps.sensitivity}
+                lang={lang}
                 ciLow={m.sensitivity.ci95.lower}
                 ciHigh={m.sensitivity.ci95.upper}
               />
@@ -141,7 +207,9 @@ const ScreeningCalc: React.FC<ScreeningCalcProps> = ({ lang }) => {
                 label={ts.specificity}
                 value={m.specificity.value}
                 color={COLORS.specificity}
-                interpretation={m.specificity.interpretation}
+                description={descriptions.specificity}
+                interp={interps.specificity}
+                lang={lang}
                 ciLow={m.specificity.ci95.lower}
                 ciHigh={m.specificity.ci95.upper}
               />
@@ -149,7 +217,9 @@ const ScreeningCalc: React.FC<ScreeningCalcProps> = ({ lang }) => {
                 label={ts.ppv}
                 value={m.ppv.value}
                 color={COLORS.ppv}
-                interpretation={m.ppv.interpretation}
+                description={descriptions.ppv}
+                interp={interps.ppv}
+                lang={lang}
                 ciLow={m.ppv.ci95.lower}
                 ciHigh={m.ppv.ci95.upper}
               />
@@ -157,7 +227,9 @@ const ScreeningCalc: React.FC<ScreeningCalcProps> = ({ lang }) => {
                 label={ts.npv}
                 value={m.npv.value}
                 color={COLORS.npv}
-                interpretation={m.npv.interpretation}
+                description={descriptions.npv}
+                interp={interps.npv}
+                lang={lang}
                 ciLow={m.npv.ci95.lower}
                 ciHigh={m.npv.ci95.upper}
               />
@@ -165,7 +237,8 @@ const ScreeningCalc: React.FC<ScreeningCalcProps> = ({ lang }) => {
                 label={ts.accuracy}
                 value={m.accuracy.value}
                 color={COLORS.accuracy}
-                interpretation={m.accuracy.interpretation}
+                description={descriptions.accuracy}
+                lang={lang}
                 ciLow={m.accuracy.ci95.lower}
                 ciHigh={m.accuracy.ci95.upper}
               />

@@ -105,14 +105,64 @@
 }
 
 .rc-interpretation {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+}
+
+.rc-summary {
   font-size: 0.82rem;
-  color: var(--text-secondary);
+  color: var(--text-primary);
   line-height: 1.5;
 }
 
-.rc-interp-label {
-  font-weight: 600;
-  color: var(--text-primary);
+.rc-toggle-btn {
+  background: none;
+  border: none;
+  padding: 0;
+  font-size: 0.72rem;
+  color: var(--text-muted);
+  text-decoration: underline;
+  cursor: pointer;
+  font-family: var(--font-body);
+  text-align: left;
+  transition: color var(--transition-fast);
+  width: fit-content;
+}
+
+.rc-toggle-btn:hover {
+  color: var(--text-secondary);
+}
+
+.rc-interp-detail {
+  display: grid;
+  grid-template-rows: 0fr;
+  transition: grid-template-rows 0.25s ease;
+}
+
+.rc-interp-detail--open {
+  grid-template-rows: 1fr;
+}
+
+.rc-interp-detail-inner {
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  padding-top: var(--space-1);
+}
+
+.rc-footnote {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  line-height: 1.5;
+}
+
+.rc-disclaimer {
+  font-size: 0.7rem;
+  color: var(--text-muted);
+  font-style: italic;
+  line-height: 1.4;
 }
 
 .rc-formula {

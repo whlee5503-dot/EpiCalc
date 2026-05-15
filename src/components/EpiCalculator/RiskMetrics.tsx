@@ -3,6 +3,7 @@ import type { TwoByTwoTable } from '../../utils/epidemiology';
 import { calcAllMetrics, fmtPct } from '../../utils/epidemiology';
 import type { Lang } from '../../i18n/translations';
 import { translations } from '../../i18n/translations';
+import { interpretResult } from '../../utils/interpretation';
 import TableInput from '../TableInput';
 import ResultCard from '../ResultCard';
 import './EpiCalculator.css';
@@ -19,6 +20,21 @@ const RiskMetrics: React.FC<Props> = ({ lang }) => {
   const tc = t.common;
 
   const metrics = useMemo(() => calcAllMetrics(table), [table]);
+
+  const interps = useMemo(() => ({
+    rr: metrics.rr
+      ? interpretResult('RR', { value: metrics.rr.value, ci_lower: metrics.rr.ci95.lower, ci_upper: metrics.rr.ci95.upper }, lang)
+      : undefined,
+    or: metrics.or
+      ? interpretResult('OR', { value: metrics.or.value, ci_lower: metrics.or.ci95.lower, ci_upper: metrics.or.ci95.upper }, lang)
+      : undefined,
+    arr: metrics.arr
+      ? interpretResult('ARR', { value: metrics.arr.value }, lang)
+      : undefined,
+    nnt: metrics.nnt
+      ? interpretResult('NNT', { value: metrics.nnt.value }, lang)
+      : undefined,
+  }), [metrics, lang]);
 
   const tableLabels = {
     rowPos: te.exposed,
@@ -93,7 +109,8 @@ const RiskMetrics: React.FC<Props> = ({ lang }) => {
           <ResultCard
             result={metrics.rr}
             ciLabel={te.ci95}
-            interpretLabel={tc.interpretation}
+            interp={interps.rr}
+            lang={lang}
             accentColor="var(--color-primary)"
             formulaHint="RR = [a/(a+b)] / [c/(c+d)]"
             undefinedLabel={tc.undefined}
@@ -101,7 +118,8 @@ const RiskMetrics: React.FC<Props> = ({ lang }) => {
           <ResultCard
             result={metrics.or}
             ciLabel={te.ci95}
-            interpretLabel={tc.interpretation}
+            interp={interps.or}
+            lang={lang}
             accentColor="var(--color-info)"
             formulaHint="OR = (a×d) / (b×c)"
             undefinedLabel={tc.undefined}
@@ -109,7 +127,8 @@ const RiskMetrics: React.FC<Props> = ({ lang }) => {
           <ResultCard
             result={metrics.arr}
             ciLabel={te.ci95}
-            interpretLabel={tc.interpretation}
+            interp={interps.arr}
+            lang={lang}
             formatAs="percent"
             accentColor="var(--color-accent)"
             formulaHint="ARR = |p₁ − p₂|"
@@ -118,7 +137,8 @@ const RiskMetrics: React.FC<Props> = ({ lang }) => {
           <ResultCard
             result={metrics.nnt}
             ciLabel={te.ci95}
-            interpretLabel={tc.interpretation}
+            interp={interps.nnt}
+            lang={lang}
             accentColor="var(--color-danger)"
             formulaHint="NNT = 1 / ARR"
             undefinedLabel={tc.undefined}
