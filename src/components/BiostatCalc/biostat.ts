@@ -395,6 +395,199 @@ export function calcANOVA(groups: ANOVAGroup[]): ANOVAResult {
   return { f, dfBetween, dfWithin, ssBetween, ssWithin, ssTotal, msBetween, msWithin, pValue, significant: pValue < 0.05, groups: groupStats, valid: true };
 }
 
+// ─── Paired t-Test ───────────────────────────────────────────────────────────
+export interface PairedTTestResult {
+  n: number;
+  diffs: number[];
+  dBar: number;
+  sd: number;
+  se: number;
+  t: number;
+  df: number;
+  pValue: number;
+  ciLow: number;
+  ciHigh: number;
+  significant: boolean;
+  valid: boolean;
+}
+
+export function calcPairedTTest(before: number[], after: number[]): PairedTTestResult {
+  const fail: PairedTTestResult = {
+    n: 0, diffs: [], dBar: 0, sd: 0, se: 0, t: 0, df: 0,
+    pValue: 1, ciLow: 0, ciHigh: 0, significant: false, valid: false,
+  };
+  if (before.length !== after.length || before.length < 2) return fail;
+  const n = before.length;
+  const diffs = before.map((b, i) => b - after[i]);
+  const dBar = diffs.reduce((s, d) => s + d, 0) / n;
+  const variance = diffs.reduce((s, d) => s + (d - dBar) ** 2, 0) / (n - 1);
+  const sd = Math.sqrt(variance);
+  const se = sd / Math.sqrt(n);
+  if (se === 0) return fail;
+  const t = dBar / se;
+  const df = n - 1;
+  const pValue = tPValue(t, df);
+  const tc = tCritical(0.05, df);
+  return {
+    n, diffs, dBar, sd, se, t, df, pValue,
+    ciLow: dBar - tc * se,
+    ciHigh: dBar + tc * se,
+    significant: pValue < 0.05,
+    valid: true,
+  };
+}
+
+// ─── Descriptive Statistics ──────────────────────────────────────────────────
+export interface DescriptiveStatsResult {
+  n: number;
+  mean: number;
+  median: number;
+  mode: number[];
+  sd: number;
+  variance: number;
+  range: number;
+  iqr: number;
+  cv: number;
+  min: number;
+  max: number;
+  q1: number;
+  q3: number;
+  skewness: number;
+  kurtosis: number;
+  valid: boolean;
+}
+
+function percentileLinear(sorted: number[], p: number): number {
+  const n = sorted.length;
+  if (n === 1) return sorted[0];
+  const idx = (p / 100) * (n - 1);
+  const lo = Math.floor(idx);
+  const hi = Math.ceil(idx);
+  if (lo === hi) return sorted[lo];
+  return sorted[lo] + (idx - lo) * (sorted[hi] - sorted[lo]);
+}
+
+export function calcDescriptiveStats(values: number[]): DescriptiveStatsResult {
+  const fail: DescriptiveStatsResult = {
+    n: 0, mean: 0, median: 0, mode: [], sd: 0, variance: 0,
+    range: 0, iqr: 0, cv: 0, min: 0, max: 0, q1: 0, q3: 0,
+    skewness: 0, kurtosis: 0, valid: false,
+  };
+  const v = values.filter(Number.isFinite);
+  if (v.length < 2) return fail;
+  const n = v.length;
+  const sorted = [...v].sort((a, b) => a - b);
+  const mean = v.reduce((s, x) => s + x, 0) / n;
+  const median = percentileLinear(sorted, 50);
+
+  const freq = new Map<number, number>();
+  for (const x of v) freq.set(x, (freq.get(x) ?? 0) + 1);
+  const maxFreq = Math.max(...freq.values());
+  const mode = maxFreq > 1
+    ? [...freq.entries()].filter(([, f]) => f === maxFreq).map(([k]) => k).sort((a, b) => a - b)
+    : [];
+
+  const variance = v.reduce((s, x) => s + (x - mean) ** 2, 0) / (n - 1);
+  const sd = Math.sqrt(variance);
+  const min = sorted[0];
+  const max = sorted[n - 1];
+  const range = max - min;
+  const q1 = percentileLinear(sorted, 25);
+  const q3 = percentileLinear(sorted, 75);
+  const iqr = q3 - q1;
+  const cv = mean !== 0 ? (sd / Math.abs(mean)) * 100 : NaN;
+
+  let skewness = 0;
+  if (n >= 3 && sd > 0) {
+    const m3 = v.reduce((s, x) => s + ((x - mean) / sd) ** 3, 0);
+    skewness = (n / ((n - 1) * (n - 2))) * m3;
+  }
+
+  let kurtosis = 0;
+  if (n >= 4 && sd > 0) {
+    const m4 = v.reduce((s, x) => s + ((x - mean) / sd) ** 4, 0);
+    kurtosis = ((n * (n + 1)) / ((n - 1) * (n - 2) * (n - 3))) * m4
+      - (3 * (n - 1) ** 2) / ((n - 2) * (n - 3));
+  }
+
+  return { n, mean, median, mode, sd, variance, range, iqr, cv, min, max, q1, q3, skewness, kurtosis, valid: true };
+}
+
+export interface HistBin { bin: string; range: string; count: number }
+
+export function calcHistBins(values: number[]): HistBin[] {
+  if (values.length < 2) return [];
+  const sorted = [...values].sort((a, b) => a - b);
+  const min = sorted[0];
+  const max = sorted[sorted.length - 1];
+  if (min === max) return [{ bin: String(min), range: String(min), count: values.length }];
+  const k = Math.min(15, Math.max(3, Math.ceil(Math.log2(values.length) + 1)));
+  const binWidth = (max - min) / k;
+  const bins: (HistBin & { x0: number; x1: number })[] = Array.from({ length: k }, (_, i) => {
+    const x0 = min + i * binWidth;
+    const x1 = min + (i + 1) * binWidth;
+    return { bin: x0.toFixed(1), range: `${x0.toFixed(1)}–${x1.toFixed(1)}`, count: 0, x0, x1 };
+  });
+  for (const v of values) {
+    let i = Math.floor((v - min) / binWidth);
+    if (i >= k) i = k - 1;
+    bins[i].count++;
+  }
+  return bins.map(({ bin, range, count }) => ({ bin, range, count }));
+}
+
+// ─── Fisher's Exact Test ─────────────────────────────────────────────────────
+export interface FishersExactResult {
+  or: number;
+  orCiLow: number;
+  orCiHigh: number;
+  pValue: number;
+  significant: boolean;
+  n: number;
+  valid: boolean;
+}
+
+export function calcFishersExact(a: number, b: number, c: number, d: number): FishersExactResult {
+  const fail: FishersExactResult = {
+    or: NaN, orCiLow: NaN, orCiHigh: NaN, pValue: 1, significant: false, n: 0, valid: false,
+  };
+  if (!Number.isInteger(a) || !Number.isInteger(b) || !Number.isInteger(c) || !Number.isInteger(d)) return fail;
+  if (a < 0 || b < 0 || c < 0 || d < 0) return fail;
+  const n = a + b + c + d;
+  if (n === 0) return fail;
+  const r1 = a + b, r2 = c + d, c1 = a + c, c2 = b + d;
+  if (r1 === 0 || r2 === 0 || c1 === 0 || c2 === 0) return fail;
+
+  // Odds Ratio
+  const bc = b * c;
+  const ad = a * d;
+  const or = bc === 0 ? (ad > 0 ? Infinity : NaN) : ad / bc;
+
+  // 95% CI via Woolf log method (valid only when all cells > 0)
+  let orCiLow = NaN, orCiHigh = NaN;
+  if (a > 0 && b > 0 && c > 0 && d > 0 && isFinite(or)) {
+    const se = Math.sqrt(1 / a + 1 / b + 1 / c + 1 / d);
+    orCiLow  = Math.exp(Math.log(or) - 1.96 * se);
+    orCiHigh = Math.exp(Math.log(or) + 1.96 * se);
+  }
+
+  // Two-tailed p-value via exact hypergeometric enumeration (log-space for stability)
+  const logConst = gammaLn(r1 + 1) + gammaLn(r2 + 1) + gammaLn(c1 + 1) + gammaLn(c2 + 1) - gammaLn(n + 1);
+  const logP = (k: number) =>
+    logConst - gammaLn(k + 1) - gammaLn(r1 - k + 1) - gammaLn(c1 - k + 1) - gammaLn(r2 - c1 + k + 1);
+  const kMin = Math.max(0, r1 - c2);
+  const kMax = Math.min(r1, c1);
+  const logPObs = logP(a);
+  let pValue = 0;
+  for (let k = kMin; k <= kMax; k++) {
+    const lp = logP(k);
+    if (lp <= logPObs + 1e-10) pValue += Math.exp(lp);
+  }
+  pValue = Math.min(1, pValue);
+
+  return { or, orCiLow, orCiHigh, pValue, significant: pValue < 0.05, n, valid: true };
+}
+
 // ─── t-distribution curve for visualization ──────────────────────────────────
 export interface TDistPoint { t: number; pdf: number; body: number; tail: number }
 export interface TDistCurveResult { data: TDistPoint[]; tRange: number; tcrit: number }

@@ -6,11 +6,14 @@ import TTest from './TTest';
 import ChiSquare from './ChiSquare';
 import ZTest from './ZTest';
 import ANOVA from './ANOVA';
+import DescriptiveStats from './DescriptiveStats';
+import PairedTTest from './PairedTTest';
+import FishersExact from './FishersExact';
 import './BiostatCalc.css';
 
 interface Props { lang: Lang }
 
-type SubTab = 'samplesize' | 'ttest' | 'chisquare' | 'ztest' | 'anova';
+type SubTab = 'samplesize' | 'ttest' | 'chisquare' | 'ztest' | 'anova' | 'descstats' | 'pairedttest' | 'fishers';
 
 const BiostatCalc: React.FC<Props> = ({ lang }) => {
   const [subTab, setSubTab] = useState<SubTab>('samplesize');
@@ -54,6 +57,24 @@ const BiostatCalc: React.FC<Props> = ({ lang }) => {
         >
           {ts.tabANOVA}
         </button>
+        <button
+          className={`bs-subtab-btn${subTab === 'descstats' ? ' active' : ''}`}
+          onClick={() => setSubTab('descstats')}
+        >
+          {ts.tabDescStats}
+        </button>
+        <button
+          className={`bs-subtab-btn${subTab === 'pairedttest' ? ' active' : ''}`}
+          onClick={() => setSubTab('pairedttest')}
+        >
+          {ts.tabPairedTTest}
+        </button>
+        <button
+          className={`bs-subtab-btn${subTab === 'fishers' ? ' active' : ''}`}
+          onClick={() => setSubTab('fishers')}
+        >
+          {ts.tabFishers}
+        </button>
       </div>
 
       {subTab === 'samplesize' && <SampleSize lang={lang} />}
@@ -61,6 +82,9 @@ const BiostatCalc: React.FC<Props> = ({ lang }) => {
       {subTab === 'ttest' && <TTest lang={lang} />}
       {subTab === 'chisquare' && <ChiSquare lang={lang} />}
       {subTab === 'anova' && <ANOVA lang={lang} />}
+      {subTab === 'descstats' && <DescriptiveStats lang={lang} />}
+      {subTab === 'pairedttest' && <PairedTTest lang={lang} />}
+      {subTab === 'fishers' && <FishersExact lang={lang} />}
     </div>
   );
 };

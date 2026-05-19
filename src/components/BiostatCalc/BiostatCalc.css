@@ -606,6 +606,138 @@
   font-family: var(--font-body);
 }
 
+/* ── Info note (Fisher's) ── */
+.bs-note {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-3);
+  padding: var(--space-3) var(--space-4);
+  background: color-mix(in srgb, var(--color-info) 8%, transparent);
+  border: 1px solid color-mix(in srgb, var(--color-info) 25%, transparent);
+  border-radius: var(--radius-md);
+  font-size: 0.82rem;
+  color: var(--color-info);
+  line-height: 1.5;
+}
+
+.bs-note--active {
+  background: color-mix(in srgb, var(--color-accent) 10%, transparent);
+  border-color: color-mix(in srgb, var(--color-accent) 35%, transparent);
+  color: var(--color-accent);
+}
+
+/* ── Fisher's table cells with percentages ── */
+.fe-cell {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-2);
+  background: var(--bg-surface-2);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-sm);
+  gap: 2px;
+}
+
+.fe-cell-count {
+  font-family: var(--font-mono);
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.fe-cell-pct {
+  font-family: var(--font-mono);
+  font-size: 0.68rem;
+  color: var(--text-muted);
+}
+
+/* ── Descriptive Stats ── */
+.bs-textarea {
+  width: 100%;
+  padding: var(--space-2) var(--space-3);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-sm);
+  background: var(--bg-surface-2);
+  color: var(--text-primary);
+  font-family: var(--font-mono);
+  font-size: 0.875rem;
+  line-height: 1.5;
+  resize: vertical;
+  min-height: 88px;
+  transition: border-color var(--transition-fast), box-shadow var(--transition-fast);
+}
+
+.bs-textarea:focus {
+  outline: none;
+  border-color: var(--color-primary);
+  box-shadow: var(--shadow-focus);
+}
+
+.ds-formula-toggle {
+  all: unset;
+  display: flex;
+  width: 100%;
+  justify-content: space-between;
+  cursor: pointer;
+  align-items: center;
+}
+
+.ds-section-card {
+  background: var(--bg-surface);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  padding: var(--space-4) var(--space-5);
+  transition: box-shadow var(--transition-fast);
+}
+
+.ds-section-card:hover {
+  box-shadow: var(--shadow-md);
+}
+
+.ds-section-title {
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--color-primary);
+  margin-bottom: var(--space-3);
+  padding-bottom: var(--space-2);
+  border-bottom: 1px solid var(--border-color-light);
+}
+
+.ds-stat-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--space-3);
+}
+
+.ds-stat-grid--4col {
+  grid-template-columns: repeat(4, 1fr);
+}
+
+.ds-stat-item {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.ds-stat-label {
+  font-size: 0.68rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--text-muted);
+}
+
+.ds-stat-value {
+  font-family: var(--font-mono);
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  line-height: 1.2;
+}
+
 /* ── Responsive ── */
 @media (max-width: 960px) {
   .bs-layout {
@@ -634,6 +766,12 @@
   }
   .bs-stat-value {
     font-size: 1.4rem;
+  }
+  .ds-stat-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  .ds-stat-grid--4col {
+    grid-template-columns: repeat(2, 1fr);
   }
 }
 
