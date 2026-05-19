@@ -254,6 +254,28 @@
   margin-left: auto;
 }
 
+/* ── Interpretation card ── */
+.bs-interp-card {
+  background: var(--bg-surface);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  padding: var(--space-4) var(--space-5);
+}
+
+.bs-interp-title {
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--text-muted);
+  margin-bottom: var(--space-2);
+}
+
+.bs-interp-body {
+  font-size: 1rem;
+  color: var(--text-primary);
+}
+
 /* ── Chart card ── */
 .bs-chart-card {
   background: var(--bg-surface);

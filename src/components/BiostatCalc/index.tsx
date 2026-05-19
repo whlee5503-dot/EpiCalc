@@ -9,11 +9,13 @@ import ANOVA from './ANOVA';
 import DescriptiveStats from './DescriptiveStats';
 import PairedTTest from './PairedTTest';
 import FishersExact from './FishersExact';
+import Correlation from './Correlation';
+import LinearRegression from './LinearRegression';
 import './BiostatCalc.css';
 
 interface Props { lang: Lang }
 
-type SubTab = 'samplesize' | 'ttest' | 'chisquare' | 'ztest' | 'anova' | 'descstats' | 'pairedttest' | 'fishers';
+type SubTab = 'samplesize' | 'ttest' | 'chisquare' | 'ztest' | 'anova' | 'descstats' | 'pairedttest' | 'fishers' | 'correlation' | 'linreg';
 
 const BiostatCalc: React.FC<Props> = ({ lang }) => {
   const [subTab, setSubTab] = useState<SubTab>('samplesize');
@@ -75,6 +77,18 @@ const BiostatCalc: React.FC<Props> = ({ lang }) => {
         >
           {ts.tabFishers}
         </button>
+        <button
+          className={`bs-subtab-btn${subTab === 'correlation' ? ' active' : ''}`}
+          onClick={() => setSubTab('correlation')}
+        >
+          {ts.tabCorrelation}
+        </button>
+        <button
+          className={`bs-subtab-btn${subTab === 'linreg' ? ' active' : ''}`}
+          onClick={() => setSubTab('linreg')}
+        >
+          {ts.tabLinReg}
+        </button>
       </div>
 
       {subTab === 'samplesize' && <SampleSize lang={lang} />}
@@ -85,6 +99,8 @@ const BiostatCalc: React.FC<Props> = ({ lang }) => {
       {subTab === 'descstats' && <DescriptiveStats lang={lang} />}
       {subTab === 'pairedttest' && <PairedTTest lang={lang} />}
       {subTab === 'fishers' && <FishersExact lang={lang} />}
+      {subTab === 'correlation' && <Correlation lang={lang} />}
+      {subTab === 'linreg' && <LinearRegression lang={lang} />}
     </div>
   );
 };

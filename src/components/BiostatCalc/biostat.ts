@@ -588,6 +588,158 @@ export function calcFishersExact(a: number, b: number, c: number, d: number): Fi
   return { or, orCiLow, orCiHigh, pValue, significant: pValue < 0.05, n, valid: true };
 }
 
+// ─── Correlation ─────────────────────────────────────────────────────────────
+function ranks(arr: number[]): number[] {
+  const indexed = arr.map((v, i) => ({ v, i })).sort((a, b) => a.v - b.v);
+  const result = new Array(arr.length);
+  let i = 0;
+  while (i < indexed.length) {
+    let j = i;
+    while (j < indexed.length - 1 && indexed[j + 1].v === indexed[j].v) j++;
+    const avgRank = (i + j) / 2 + 1;
+    for (let k = i; k <= j; k++) result[indexed[k].i] = avgRank;
+    i = j + 1;
+  }
+  return result;
+}
+
+export interface CorrelationResult {
+  n: number;
+  pearsonR: number;
+  spearmanRho: number;
+  tStat: number;
+  pValue: number;
+  ciLow: number;
+  ciHigh: number;
+  rSquared: number;
+  valid: boolean;
+}
+
+export function calcCorrelation(x: number[], y: number[]): CorrelationResult {
+  const fail: CorrelationResult = { n: 0, pearsonR: 0, spearmanRho: 0, tStat: 0, pValue: 1, ciLow: 0, ciHigh: 0, rSquared: 0, valid: false };
+  if (x.length !== y.length || x.length < 3) return fail;
+  const n = x.length;
+
+  const meanX = x.reduce((s, v) => s + v, 0) / n;
+  const meanY = y.reduce((s, v) => s + v, 0) / n;
+  let sXY = 0, sX2 = 0, sY2 = 0;
+  for (let i = 0; i < n; i++) {
+    sXY += (x[i] - meanX) * (y[i] - meanY);
+    sX2 += (x[i] - meanX) ** 2;
+    sY2 += (y[i] - meanY) ** 2;
+  }
+  if (sX2 === 0 || sY2 === 0) return fail;
+  const pearsonR = sXY / Math.sqrt(sX2 * sY2);
+
+  const rankX = ranks(x);
+  const rankY = ranks(y);
+  const mrX = rankX.reduce((s, v) => s + v, 0) / n;
+  const mrY = rankY.reduce((s, v) => s + v, 0) / n;
+  let srXY = 0, srX2 = 0, srY2 = 0;
+  for (let i = 0; i < n; i++) {
+    srXY += (rankX[i] - mrX) * (rankY[i] - mrY);
+    srX2 += (rankX[i] - mrX) ** 2;
+    srY2 += (rankY[i] - mrY) ** 2;
+  }
+  const spearmanRho = srX2 === 0 || srY2 === 0 ? 0 : srXY / Math.sqrt(srX2 * srY2);
+
+  const r2 = pearsonR * pearsonR;
+  const tStat = r2 >= 1 ? Infinity : pearsonR * Math.sqrt(n - 2) / Math.sqrt(1 - r2);
+  const pValue = tPValue(tStat, n - 2);
+
+  // Fisher's z transformation for 95% CI (requires n >= 4)
+  const z = Math.atanh(pearsonR);
+  const se = 1 / Math.sqrt(n - 3);
+  const ciLow = Math.tanh(z - 1.96 * se);
+  const ciHigh = Math.tanh(z + 1.96 * se);
+
+  return { n, pearsonR, spearmanRho, tStat, pValue, ciLow, ciHigh, rSquared: r2, valid: true };
+}
+
+// ─── Linear Regression ───────────────────────────────────────────────────────
+export interface LinearRegressionResult {
+  n: number;
+  slope: number;
+  intercept: number;
+  rSquared: number;
+  adjRSquared: number;
+  se: number;
+  seSlope: number;
+  seIntercept: number;
+  tSlope: number;
+  tIntercept: number;
+  pSlope: number;
+  pIntercept: number;
+  ciSlopeLow: number;
+  ciSlopeHigh: number;
+  fStat: number;
+  pF: number;
+  ssRes: number;
+  ssTot: number;
+  ssReg: number;
+  residuals: number[];
+  fitted: number[];
+  valid: boolean;
+}
+
+export function calcLinearRegression(x: number[], y: number[]): LinearRegressionResult {
+  const fail: LinearRegressionResult = {
+    n: 0, slope: 0, intercept: 0, rSquared: 0, adjRSquared: 0,
+    se: 0, seSlope: 0, seIntercept: 0, tSlope: 0, tIntercept: 0,
+    pSlope: 1, pIntercept: 1, ciSlopeLow: 0, ciSlopeHigh: 0,
+    fStat: 0, pF: 1, ssRes: 0, ssTot: 0, ssReg: 0,
+    residuals: [], fitted: [], valid: false,
+  };
+  if (x.length !== y.length || x.length < 3) return fail;
+  const n = x.length;
+  const meanX = x.reduce((s, v) => s + v, 0) / n;
+  const meanY = y.reduce((s, v) => s + v, 0) / n;
+
+  let sXY = 0, sX2 = 0;
+  for (let i = 0; i < n; i++) {
+    sXY += (x[i] - meanX) * (y[i] - meanY);
+    sX2 += (x[i] - meanX) ** 2;
+  }
+  if (sX2 === 0) return fail;
+
+  const slope = sXY / sX2;
+  const intercept = meanY - slope * meanX;
+
+  const fitted = x.map(xi => intercept + slope * xi);
+  const residuals = y.map((yi, i) => yi - fitted[i]);
+  const ssRes = residuals.reduce((s, e) => s + e * e, 0);
+  const ssTot = y.reduce((s, yi) => s + (yi - meanY) ** 2, 0);
+  if (ssTot === 0) return fail;
+  const ssReg = ssTot - ssRes;
+
+  const rSquared = 1 - ssRes / ssTot;
+  const adjRSquared = 1 - (1 - rSquared) * (n - 1) / (n - 2);
+
+  const df = n - 2;
+  const se = Math.sqrt(ssRes / df);
+  const seSlope = se / Math.sqrt(sX2);
+  const seIntercept = se * Math.sqrt(x.reduce((s, xi) => s + xi * xi, 0) / (n * sX2));
+
+  const tSlope = seSlope === 0 ? Infinity : slope / seSlope;
+  const tIntercept = seIntercept === 0 ? Infinity : intercept / seIntercept;
+  const pSlope = tPValue(tSlope, df);
+  const pIntercept = tPValue(tIntercept, df);
+
+  const tc = tCritical(0.05, df);
+  const ciSlopeLow = slope - tc * seSlope;
+  const ciSlopeHigh = slope + tc * seSlope;
+
+  const fStat = ssReg / (ssRes / df);
+  const pF = fPValue(fStat, 1, df);
+
+  return {
+    n, slope, intercept, rSquared, adjRSquared,
+    se, seSlope, seIntercept, tSlope, tIntercept,
+    pSlope, pIntercept, ciSlopeLow, ciSlopeHigh,
+    fStat, pF, ssRes, ssTot, ssReg, residuals, fitted, valid: true,
+  };
+}
+
 // ─── t-distribution curve for visualization ──────────────────────────────────
 export interface TDistPoint { t: number; pdf: number; body: number; tail: number }
 export interface TDistCurveResult { data: TDistPoint[]; tRange: number; tcrit: number }
