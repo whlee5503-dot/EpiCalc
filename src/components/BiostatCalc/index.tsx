@@ -11,11 +11,13 @@ import PairedTTest from './PairedTTest';
 import FishersExact from './FishersExact';
 import Correlation from './Correlation';
 import LinearRegression from './LinearRegression';
+import WilcoxonRankSum from './WilcoxonRankSum';
+import McNemarTest from './McNemarTest';
 import './BiostatCalc.css';
 
 interface Props { lang: Lang }
 
-type SubTab = 'samplesize' | 'ttest' | 'chisquare' | 'ztest' | 'anova' | 'descstats' | 'pairedttest' | 'fishers' | 'correlation' | 'linreg';
+type SubTab = 'samplesize' | 'ttest' | 'chisquare' | 'ztest' | 'anova' | 'descstats' | 'pairedttest' | 'fishers' | 'correlation' | 'linreg' | 'wilcoxon' | 'mcnemar';
 
 const BiostatCalc: React.FC<Props> = ({ lang }) => {
   const [subTab, setSubTab] = useState<SubTab>('samplesize');
@@ -89,6 +91,18 @@ const BiostatCalc: React.FC<Props> = ({ lang }) => {
         >
           {ts.tabLinReg}
         </button>
+        <button
+          className={`bs-subtab-btn${subTab === 'wilcoxon' ? ' active' : ''}`}
+          onClick={() => setSubTab('wilcoxon')}
+        >
+          {ts.tabWilcoxon}
+        </button>
+        <button
+          className={`bs-subtab-btn${subTab === 'mcnemar' ? ' active' : ''}`}
+          onClick={() => setSubTab('mcnemar')}
+        >
+          {ts.tabMcNemar}
+        </button>
       </div>
 
       {subTab === 'samplesize' && <SampleSize lang={lang} />}
@@ -101,6 +115,8 @@ const BiostatCalc: React.FC<Props> = ({ lang }) => {
       {subTab === 'fishers' && <FishersExact lang={lang} />}
       {subTab === 'correlation' && <Correlation lang={lang} />}
       {subTab === 'linreg' && <LinearRegression lang={lang} />}
+      {subTab === 'wilcoxon' && <WilcoxonRankSum lang={lang} />}
+      {subTab === 'mcnemar' && <McNemarTest lang={lang} />}
     </div>
   );
 };

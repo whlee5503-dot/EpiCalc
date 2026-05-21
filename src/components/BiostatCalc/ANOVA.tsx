@@ -5,7 +5,7 @@ import {
 } from 'recharts';
 import type { Lang } from '../../i18n/translations';
 import { translations } from '../../i18n/translations';
-import { calcANOVA } from './biostat';
+import { calcANOVA, calcTukeyHSD } from './biostat';
 
 interface Props { lang: Lang }
 
@@ -59,6 +59,7 @@ const ANOVA: React.FC<Props> = ({ lang }) => {
   );
 
   const result = useMemo(() => calcANOVA(parsedGroups), [parsedGroups]);
+  const tukey = useMemo(() => calcTukeyHSD(result), [result]);
 
   const chartData = useMemo(
     () => result.valid
@@ -254,20 +255,41 @@ const ANOVA: React.FC<Props> = ({ lang }) => {
               </ResponsiveContainer>
             </div>
 
-            {/* Pro hint */}
-            <div className="bs-chart-card anova-pro-card">
-              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 'var(--space-4)', flexWrap: 'wrap' }}>
-                <div>
-                  <div style={{ fontWeight: 600, fontSize: '0.9rem', color: 'var(--text-secondary)', marginBottom: 'var(--space-1)' }}>
-                    {ts.anovaPostHocTitle}
-                  </div>
-                  <div style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>
-                    {ts.anovaPostHocHint}
-                  </div>
+            {/* Tukey HSD Post-Hoc */}
+            {tukey.valid && (
+              <div className="bs-chart-card">
+                <div className="bs-chart-header">
+                  <h2 className="bs-chart-title">{ts.anovaPostHocTukey}</h2>
+                  <span className="bs-chart-sub">α = 0.05</span>
                 </div>
-                <span className="anova-pro-badge">{ts.anovaProBadge}</span>
+                <div style={{ overflowX: 'auto' }}>
+                  <table className="anova-table">
+                    <thead>
+                      <tr>
+                        {[ts.tukeyPair, ts.tukeyMeanDiff, ts.tukeyCI95, ts.tukeyQ, ts.tukeySig].map((h, i) => (
+                          <th key={i}>{h}</th>
+                        ))}
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {tukey.pairs.map((pair, i) => (
+                        <tr key={i}>
+                          <td className="anova-table__source">{pair.nameI} − {pair.nameJ}</td>
+                          <td style={{ fontFamily: 'var(--font-mono)' }}>{pair.meanDiff.toFixed(3)}</td>
+                          <td style={{ fontFamily: 'var(--font-mono)', fontSize: '0.78rem' }}>
+                            [{pair.ciLow.toFixed(3)}, {pair.ciHigh.toFixed(3)}]
+                          </td>
+                          <td style={{ fontFamily: 'var(--font-mono)' }}>{pair.q.toFixed(3)}</td>
+                          <td style={{ color: pair.significant ? 'var(--color-danger)' : 'var(--text-muted)', fontWeight: 700 }}>
+                            {pair.significant ? ts.tukeyYes : ts.tukeyNo}
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
               </div>
-            </div>
+            )}
           </>
         ) : (
           <div className="bs-empty-state">

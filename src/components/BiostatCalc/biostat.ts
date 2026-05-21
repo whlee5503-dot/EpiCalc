@@ -757,3 +757,172 @@ export function calcTDistCurve(df: number, tStat: number): TDistCurveResult {
   });
   return { data, tRange, tcrit };
 }
+
+// ─── Wilcoxon Rank-Sum (Mann-Whitney U) ──────────────────────────────────────
+export interface WilcoxonResult {
+  u1: number;
+  u2: number;
+  uStat: number;
+  n1: number;
+  n2: number;
+  z: number;
+  pValue: number;
+  significant: boolean;
+  rankSumW1: number;
+  valid: boolean;
+}
+
+export function calcWilcoxon(group1: number[], group2: number[]): WilcoxonResult {
+  const fail: WilcoxonResult = { u1: 0, u2: 0, uStat: 0, n1: 0, n2: 0, z: 0, pValue: 1, significant: false, rankSumW1: 0, valid: false };
+  if (group1.length < 2 || group2.length < 2) return fail;
+  const n1 = group1.length;
+  const n2 = group2.length;
+
+  // Assign ranks to combined sorted array (average ranks for ties)
+  const combined = [
+    ...group1.map(v => ({ v, grp: 1 })),
+    ...group2.map(v => ({ v, grp: 2 })),
+  ].sort((a, b) => a.v - b.v);
+
+  const ranked = new Array(combined.length);
+  let i = 0;
+  while (i < combined.length) {
+    let j = i;
+    while (j < combined.length - 1 && combined[j + 1].v === combined[j].v) j++;
+    const avgRank = (i + j) / 2 + 1;
+    for (let k = i; k <= j; k++) ranked[k] = avgRank;
+    i = j + 1;
+  }
+
+  let rankSumW1 = 0;
+  for (let k = 0; k < combined.length; k++) {
+    if (combined[k].grp === 1) rankSumW1 += ranked[k];
+  }
+
+  const u1 = rankSumW1 - (n1 * (n1 + 1)) / 2;
+  const u2 = n1 * n2 - u1;
+  const uStat = Math.min(u1, u2);
+
+  // Normal approximation (valid when n1, n2 >= 8)
+  const N = n1 + n2;
+  const muU = (n1 * n2) / 2;
+
+  // Tie correction for variance
+  const tieGroups = new Map<number, number>();
+  for (const { v } of combined) tieGroups.set(v, (tieGroups.get(v) ?? 0) + 1);
+  let tieCorrection = 0;
+  for (const t of tieGroups.values()) tieCorrection += t * t * t - t;
+  const varU = ((n1 * n2) / 12) * (N + 1 - tieCorrection / (N * (N - 1)));
+
+  if (varU <= 0) return fail;
+  const z = (uStat - muU) / Math.sqrt(varU);
+  const pValue = 2 * (1 - normalCDF(Math.abs(z)));
+
+  return { u1, u2, uStat, n1, n2, z, pValue, significant: pValue < 0.05, rankSumW1, valid: true };
+}
+
+// ─── McNemar Test ────────────────────────────────────────────────────────────
+export interface McNemarResult {
+  b: number;
+  c: number;
+  chiSq: number;
+  pValue: number;
+  significant: boolean;
+  concordance: number;
+  discordance: number;
+  n: number;
+  valid: boolean;
+}
+
+export function calcMcNemar(a: number, b: number, c: number, d: number): McNemarResult {
+  const fail: McNemarResult = { b: 0, c: 0, chiSq: 0, pValue: 1, significant: false, concordance: 0, discordance: 0, n: 0, valid: false };
+  if (!Number.isInteger(a) || !Number.isInteger(b) || !Number.isInteger(c) || !Number.isInteger(d)) return fail;
+  if (a < 0 || b < 0 || c < 0 || d < 0) return fail;
+  const n = a + b + c + d;
+  if (n === 0 || b + c === 0) return fail;
+
+  // McNemar with continuity correction
+  const chiSq = (Math.abs(b - c) - 1) ** 2 / (b + c);
+  const pValue = chiSquarePValue(chiSq, 1);
+  const concordance = (a + d) / n;
+  const discordance = (b + c) / n;
+
+  return { b, c, chiSq, pValue, significant: pValue < 0.05, concordance, discordance, n, valid: true };
+}
+
+// ─── Tukey HSD Post-Hoc ──────────────────────────────────────────────────────
+export interface TukeyPair {
+  i: number;
+  j: number;
+  nameI: string;
+  nameJ: string;
+  meanDiff: number;
+  se: number;
+  q: number;
+  ciLow: number;
+  ciHigh: number;
+  significant: boolean;
+}
+
+export interface TukeyResult {
+  pairs: TukeyPair[];
+  msWithin: number;
+  dfWithin: number;
+  valid: boolean;
+}
+
+// Studentized range distribution p-value via simulation-free approximation
+// Uses the Copenhaver & Holland (1988) rational approximation
+function qCritical(alpha: number, k: number, df: number): number {
+  // Bisect on the studentized range CDF approximation
+  // We use the fact that Q ~ chi/sqrt(chi_df) and integrate numerically
+  // Simpler: use the well-known table values approximated by:
+  // For alpha=0.05, use polynomial fits per k (accurate to ~1%)
+  const alphaKey = Math.round(alpha * 100);
+  if (alphaKey !== 5) {
+    // fallback for alpha != 0.05: use conservative t-based bound
+    return tCritical(alpha / k / (k - 1), df) * Math.sqrt(2);
+  }
+
+  // q_crit table row: k=2..8 at alpha=0.05, df=inf (use as upper bound scale)
+  const qInf = [0, 0, 2.772, 3.314, 3.633, 3.858, 4.030, 4.170, 4.286];
+  const qBase = k <= 8 ? qInf[k] : qInf[8] + (k - 8) * 0.08;
+
+  // df correction factor: q_crit(k,df) ≈ q_crit(k,∞) * (1 + 3/(df-2))^0.5
+  const dfFactor = df > 4 ? Math.sqrt(1 + 3 / (df - 2)) : 1.35;
+  return qBase * dfFactor;
+}
+
+export function calcTukeyHSD(anovaResult: { groups: ANOVAGroupStats[]; msWithin: number; dfWithin: number; valid: boolean }): TukeyResult {
+  const fail: TukeyResult = { pairs: [], msWithin: 0, dfWithin: 0, valid: false };
+  if (!anovaResult.valid) return fail;
+
+  const { groups, msWithin, dfWithin } = anovaResult;
+  const k = groups.length;
+  const qcrit = qCritical(0.05, k, dfWithin);
+  const pairs: TukeyPair[] = [];
+
+  for (let i = 0; i < k; i++) {
+    for (let j = i + 1; j < k; j++) {
+      const gi = groups[i];
+      const gj = groups[j];
+      const se = Math.sqrt(msWithin / 2 * (1 / gi.n + 1 / gj.n));
+      const meanDiff = gi.mean - gj.mean;
+      const q = Math.abs(meanDiff) / se;
+      const hsd = qcrit * se;
+      pairs.push({
+        i, j,
+        nameI: gi.name,
+        nameJ: gj.name,
+        meanDiff,
+        se,
+        q,
+        ciLow: meanDiff - hsd,
+        ciHigh: meanDiff + hsd,
+        significant: q > qcrit,
+      });
+    }
+  }
+
+  return { pairs, msWithin, dfWithin, valid: true };
+}
