@@ -17,11 +17,47 @@ import './BiostatCalc.css';
 
 interface Props { lang: Lang }
 
+type GroupTab = 'descriptive' | 'parametric' | 'nonparametric';
 type SubTab = 'samplesize' | 'ttest' | 'chisquare' | 'ztest' | 'anova' | 'descstats' | 'pairedttest' | 'fishers' | 'correlation' | 'linreg' | 'wilcoxon' | 'mcnemar';
 
+const GROUPS: { id: GroupTab; subtabs: SubTab[] }[] = [
+  { id: 'descriptive',    subtabs: ['descstats', 'samplesize'] },
+  { id: 'parametric',     subtabs: ['ztest', 'ttest', 'pairedttest', 'anova', 'linreg', 'correlation'] },
+  { id: 'nonparametric',  subtabs: ['chisquare', 'fishers', 'wilcoxon', 'mcnemar'] },
+];
+
 const BiostatCalc: React.FC<Props> = ({ lang }) => {
-  const [subTab, setSubTab] = useState<SubTab>('samplesize');
+  const [group, setGroup] = useState<GroupTab>('descriptive');
+  const [subTab, setSubTab] = useState<SubTab>('descstats');
   const ts = translations[lang].biostat;
+
+  const handleGroupChange = (g: GroupTab) => {
+    setGroup(g);
+    setSubTab(GROUPS.find(gt => gt.id === g)!.subtabs[0]);
+  };
+
+  const tabLabels: Record<SubTab, string> = {
+    descstats:   ts.tabDescStats,
+    samplesize:  ts.tabSampleSize,
+    ztest:       ts.tabZTest,
+    ttest:       ts.tabTTest,
+    pairedttest: ts.tabPairedTTest,
+    anova:       ts.tabANOVA,
+    linreg:      ts.tabLinReg,
+    correlation: ts.tabCorrelation,
+    chisquare:   ts.tabChiSquare,
+    fishers:     ts.tabFishers,
+    wilcoxon:    ts.tabWilcoxon,
+    mcnemar:     ts.tabMcNemar,
+  };
+
+  const groupLabels: Record<GroupTab, string> = {
+    descriptive:   ts.groupDescriptive,
+    parametric:    ts.groupParametric,
+    nonparametric: ts.groupNonParametric,
+  };
+
+  const currentSubtabs = GROUPS.find(gt => gt.id === group)!.subtabs;
 
   return (
     <div className="bs-calc">
@@ -30,93 +66,44 @@ const BiostatCalc: React.FC<Props> = ({ lang }) => {
         <p className="calc-subtitle">{ts.subtitle}</p>
       </div>
 
-      <div className="bs-subtab-bar">
-        <button
-          className={`bs-subtab-btn${subTab === 'samplesize' ? ' active' : ''}`}
-          onClick={() => setSubTab('samplesize')}
-        >
-          {ts.tabSampleSize}
-        </button>
-        <button
-          className={`bs-subtab-btn${subTab === 'ztest' ? ' active' : ''}`}
-          onClick={() => setSubTab('ztest')}
-        >
-          {ts.tabZTest}
-        </button>
-        <button
-          className={`bs-subtab-btn${subTab === 'ttest' ? ' active' : ''}`}
-          onClick={() => setSubTab('ttest')}
-        >
-          {ts.tabTTest}
-        </button>
-        <button
-          className={`bs-subtab-btn${subTab === 'chisquare' ? ' active' : ''}`}
-          onClick={() => setSubTab('chisquare')}
-        >
-          {ts.tabChiSquare}
-        </button>
-        <button
-          className={`bs-subtab-btn${subTab === 'anova' ? ' active' : ''}`}
-          onClick={() => setSubTab('anova')}
-        >
-          {ts.tabANOVA}
-        </button>
-        <button
-          className={`bs-subtab-btn${subTab === 'descstats' ? ' active' : ''}`}
-          onClick={() => setSubTab('descstats')}
-        >
-          {ts.tabDescStats}
-        </button>
-        <button
-          className={`bs-subtab-btn${subTab === 'pairedttest' ? ' active' : ''}`}
-          onClick={() => setSubTab('pairedttest')}
-        >
-          {ts.tabPairedTTest}
-        </button>
-        <button
-          className={`bs-subtab-btn${subTab === 'fishers' ? ' active' : ''}`}
-          onClick={() => setSubTab('fishers')}
-        >
-          {ts.tabFishers}
-        </button>
-        <button
-          className={`bs-subtab-btn${subTab === 'correlation' ? ' active' : ''}`}
-          onClick={() => setSubTab('correlation')}
-        >
-          {ts.tabCorrelation}
-        </button>
-        <button
-          className={`bs-subtab-btn${subTab === 'linreg' ? ' active' : ''}`}
-          onClick={() => setSubTab('linreg')}
-        >
-          {ts.tabLinReg}
-        </button>
-        <button
-          className={`bs-subtab-btn${subTab === 'wilcoxon' ? ' active' : ''}`}
-          onClick={() => setSubTab('wilcoxon')}
-        >
-          {ts.tabWilcoxon}
-        </button>
-        <button
-          className={`bs-subtab-btn${subTab === 'mcnemar' ? ' active' : ''}`}
-          onClick={() => setSubTab('mcnemar')}
-        >
-          {ts.tabMcNemar}
-        </button>
+      <div className="bs-nav">
+        <div className="bs-group-bar">
+          {GROUPS.map(gt => (
+            <button
+              key={gt.id}
+              className={`bs-group-btn${group === gt.id ? ' active' : ''}`}
+              onClick={() => handleGroupChange(gt.id)}
+            >
+              {groupLabels[gt.id]}
+            </button>
+          ))}
+        </div>
+
+        <div className="bs-subtab-bar">
+          {currentSubtabs.map(tab => (
+            <button
+              key={tab}
+              className={`bs-subtab-btn${subTab === tab ? ' active' : ''}`}
+              onClick={() => setSubTab(tab)}
+            >
+              {tabLabels[tab]}
+            </button>
+          ))}
+        </div>
       </div>
 
-      {subTab === 'samplesize' && <SampleSize lang={lang} />}
-      {subTab === 'ztest' && <ZTest lang={lang} />}
-      {subTab === 'ttest' && <TTest lang={lang} />}
-      {subTab === 'chisquare' && <ChiSquare lang={lang} />}
-      {subTab === 'anova' && <ANOVA lang={lang} />}
-      {subTab === 'descstats' && <DescriptiveStats lang={lang} />}
+      {subTab === 'descstats'   && <DescriptiveStats lang={lang} />}
+      {subTab === 'samplesize'  && <SampleSize lang={lang} />}
+      {subTab === 'ztest'       && <ZTest lang={lang} />}
+      {subTab === 'ttest'       && <TTest lang={lang} />}
       {subTab === 'pairedttest' && <PairedTTest lang={lang} />}
-      {subTab === 'fishers' && <FishersExact lang={lang} />}
+      {subTab === 'anova'       && <ANOVA lang={lang} />}
+      {subTab === 'linreg'      && <LinearRegression lang={lang} />}
       {subTab === 'correlation' && <Correlation lang={lang} />}
-      {subTab === 'linreg' && <LinearRegression lang={lang} />}
-      {subTab === 'wilcoxon' && <WilcoxonRankSum lang={lang} />}
-      {subTab === 'mcnemar' && <McNemarTest lang={lang} />}
+      {subTab === 'chisquare'   && <ChiSquare lang={lang} />}
+      {subTab === 'fishers'     && <FishersExact lang={lang} />}
+      {subTab === 'wilcoxon'    && <WilcoxonRankSum lang={lang} />}
+      {subTab === 'mcnemar'     && <McNemarTest lang={lang} />}
     </div>
   );
 };

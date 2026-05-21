@@ -106,6 +106,9 @@ export const translations = {
       tabLinReg: 'Linear Regression',
       tabWilcoxon: 'Wilcoxon (Mann-Whitney)',
       tabMcNemar: 'McNemar',
+      groupDescriptive: 'Descriptive',
+      groupParametric: 'Parametric',
+      groupNonParametric: 'Non-Parametric',
       parameters: 'Parameters',
       // Sample Size
       p1: 'Control event rate (p₁)',
@@ -526,6 +529,9 @@ export const translations = {
       tabLinReg: '선형회귀',
       tabWilcoxon: 'Wilcoxon (Mann-Whitney)',
       tabMcNemar: 'McNemar',
+      groupDescriptive: '기술통계',
+      groupParametric: '모수 검정',
+      groupNonParametric: '비모수 검정',
       parameters: '매개변수',
       // Sample Size
       p1: '대조군 사건 발생률 (p₁)',

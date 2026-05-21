@@ -10,23 +10,72 @@
   to   { opacity: 1; transform: translateY(0); }
 }
 
-/* ── Sub-tab bar ── */
-.bs-subtab-bar {
+/* ── Two-level navigation ── */
+.bs-nav {
   display: flex;
+  flex-direction: column;
   gap: var(--space-2);
+  margin-bottom: var(--space-8);
+}
+
+/* Group bar (level 1) */
+.bs-group-bar {
+  display: flex;
   background: var(--bg-surface);
   border: 1px solid var(--border-color);
   border-radius: var(--radius-md);
   padding: var(--space-1);
-  width: fit-content;
-  margin-bottom: var(--space-8);
+  width: 100%;
+}
+
+.bs-group-btn {
+  flex: 1;
+  padding: var(--space-3) var(--space-4);
+  border-radius: calc(var(--radius-md) - 2px);
+  font-family: var(--font-body);
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  border: none;
+  background: transparent;
+  color: var(--text-muted);
+  transition: all var(--transition-fast);
+  white-space: nowrap;
+  text-align: center;
+}
+
+.bs-group-btn:hover:not(.active) {
+  color: var(--text-primary);
+  background: var(--bg-surface-2);
+}
+
+.bs-group-btn.active {
+  background: var(--color-primary);
+  color: var(--text-on-primary);
+}
+
+/* Sub-tab bar (level 2) */
+.bs-subtab-bar {
+  display: flex;
+  gap: var(--space-1);
+  background: var(--bg-surface);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  padding: var(--space-1);
+  width: 100%;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+
+.bs-subtab-bar::-webkit-scrollbar {
+  display: none;
 }
 
 .bs-subtab-btn {
-  padding: var(--space-2) var(--space-5);
+  padding: var(--space-2) var(--space-4);
   border-radius: calc(var(--radius-md) - 2px);
   font-family: var(--font-body);
-  font-size: 0.875rem;
+  font-size: 0.8rem;
   font-weight: 500;
   cursor: pointer;
   border: none;
@@ -34,6 +83,7 @@
   color: var(--text-muted);
   transition: all var(--transition-fast);
   white-space: nowrap;
+  flex-shrink: 0;
 }
 
 .bs-subtab-btn:hover:not(.active) {
@@ -42,8 +92,8 @@
 }
 
 .bs-subtab-btn.active {
-  background: var(--color-primary);
-  color: var(--text-on-primary);
+  background: color-mix(in srgb, var(--color-primary) 15%, transparent);
+  color: var(--color-primary);
   font-weight: 600;
 }
 
@@ -774,14 +824,9 @@
   .bs-calc {
     padding: var(--space-5) var(--space-4);
   }
-  .bs-subtab-bar {
-    width: 100%;
-    flex-wrap: wrap;
-  }
-  .bs-subtab-btn {
-    flex: 1 1 auto;
-    text-align: center;
-    min-width: max-content;
+  .bs-group-btn {
+    font-size: 0.8rem;
+    padding: var(--space-2) var(--space-2);
   }
   .bs-stats-grid {
     grid-template-columns: 1fr 1fr;
