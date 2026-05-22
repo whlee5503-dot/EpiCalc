@@ -85,7 +85,21 @@ function fmtPercent(v: number): string {
 }
 
 const SIRSimulator: React.FC<SIRSimulatorProps> = ({ lang }) => {
-  const [params, setParams] = useState<SimParams>(DEFAULT_PARAMS);
+  const [params, setParams] = useState<SimParams>(() => {
+    const sp = new URLSearchParams(window.location.search);
+    const overrides: Partial<SimParams> = {};
+    const population = sp.get('population');
+    const cases = sp.get('cases');
+    if (population) {
+      const v = parseInt(population, 10);
+      if (!isNaN(v) && v > 0) overrides.N = v;
+    }
+    if (cases) {
+      const v = parseInt(cases, 10);
+      if (!isNaN(v) && v > 0) overrides.I0 = v;
+    }
+    return { ...DEFAULT_PARAMS, ...overrides };
+  });
   const ts = translations[lang].sir;
 
   const result = useMemo(() => runSimulation(params), [params]);

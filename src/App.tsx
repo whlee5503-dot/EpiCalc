@@ -14,7 +14,11 @@ type Tab = 'epi' | 'screening' | 'sir' | 'biostat';
 type Theme = 'light' | 'dark';
 
 function App() {
-  const [tab, setTab] = useState<Tab>('epi');
+  const [tab, setTab] = useState<Tab>(() => {
+    const sp = new URLSearchParams(window.location.search);
+    if (sp.has('population') || sp.has('cases') || sp.has('deaths')) return 'sir';
+    return 'epi';
+  });
   const [lang, setLang] = useState<Lang>('en');
   const [theme, setTheme] = useState<Theme>('light');
 
