@@ -19,6 +19,7 @@ export const translations = {
       tabDiseaseFreq: 'Disease Frequency',
       tabVaccineEfficacy: 'Vaccine Efficacy',
       tabBurden: 'Burden of Disease',
+      tabAttributableRisk: 'Attributable Risk',
       tableTitle: '2×2 Contingency Table',
       exposed: 'Exposed',
       unexposed: 'Unexposed',
@@ -416,6 +417,37 @@ export const translations = {
       reset: 'Reset',
       invalidInput: 'Enter valid values to see results',
     },
+    attributableRisk: {
+      title: 'Attributable Risk',
+      subtitle: 'Fraction of disease attributable to an exposure — in the exposed group and the total population',
+      tabAF: 'Attrib. Fraction',
+      tabPAF: 'Population AF',
+      // Inputs
+      rrLabel: 'Relative Risk (RR)',
+      peLabel: 'Exposure prevalence in population (%)',
+      // Results
+      afResult: 'Attributable Fraction (AF%)',
+      pafResult: 'Population Attrib. Fraction (PAF%)',
+      afResultHint: 'AF% (exposed group)',
+      // Interpretation — AF
+      afVeryHigh: 'Very high AF (≥75%) — the vast majority of disease in exposed individuals is attributable to this exposure. Eliminating the exposure could prevent most cases in this group.',
+      afHigh: 'High AF (50–75%) — more than half of disease in exposed individuals is attributable to this exposure. Targeted interventions on the exposure could have a substantial impact.',
+      afMod: 'Moderate AF (25–50%) — a notable portion of disease in exposed individuals is attributable to this exposure. It plays a meaningful causal role.',
+      afLow: 'Low AF (<25%) — a small proportion of disease in exposed individuals is attributable to this exposure. Other factors likely contribute more.',
+      afNeg: 'Protective factor — this exposure reduces disease risk (RR < 1). Fewer cases occur among exposed individuals than would be expected without the exposure.',
+      // Interpretation — PAF
+      pafHigh: 'High population impact (≥50%) — the majority of disease burden in the total population is attributable to this exposure. A population-level intervention could dramatically reduce incidence.',
+      pafMod: 'Moderate population impact (25–50%) — a significant fraction of disease burden is attributable to this exposure. Population-wide action would yield meaningful reductions.',
+      pafLow: 'Limited population impact (<25%) — despite the exposure–disease association, a smaller fraction of total disease burden is attributable to this exposure.',
+      pafNeg: 'Protective exposure — this factor reduces disease burden at the population level (RR < 1).',
+      // Notes
+      afNote: 'AF assumes a causal relationship. Apply only when there is strong evidence that the exposure causes the disease.',
+      pafNote: "PAF uses Levin's formula. It estimates how much disease burden could be eliminated if the exposure were removed from the entire population.",
+      // Common
+      loadExample: 'Load Example',
+      reset: 'Reset',
+      invalidInput: 'Enter valid values to see results',
+    },
     common: {
       interpretation: 'Interpretation',
       formula: 'Formula',
@@ -442,6 +474,7 @@ export const translations = {
       tabDiseaseFreq: '질병 빈도',
       tabVaccineEfficacy: '백신 효과',
       tabBurden: '질병 부담',
+      tabAttributableRisk: '귀속위험',
       tableTitle: '2×2 분할표',
       exposed: '노출',
       unexposed: '비노출',
@@ -823,6 +856,37 @@ export const translations = {
       yldFormula: 'YLD = 환자 × 장애 가중치 × 기간',
       dalyNote: 'DALY는 조기 사망으로 인한 손실년수(YLL)와 장애를 가지고 생존한 손실년수(YLD)의 합입니다.',
       dwNote: '장애 가중치는 0(완전 건강)에서 1(사망과 동등)까지입니다. WHO GBD에서 참고값을 확인하세요.',
+      loadExample: '예제 불러오기',
+      reset: '초기화',
+      invalidInput: '유효한 값을 입력하면 결과가 표시됩니다',
+    },
+    attributableRisk: {
+      title: '귀속위험',
+      subtitle: '노출군 및 전체 인구에서 특정 노출에 귀속되는 질병 분율 계산',
+      tabAF: '귀속분율',
+      tabPAF: '인구 귀속분율',
+      // Inputs
+      rrLabel: '상대위험도 (RR)',
+      peLabel: '인구에서 노출 유병률 (%)',
+      // Results
+      afResult: '귀속분율 (AF%)',
+      pafResult: '인구 귀속분율 (PAF%)',
+      afResultHint: 'AF% (노출군)',
+      // Interpretation — AF
+      afVeryHigh: '매우 높은 귀속분율 (≥75%) — 노출군 질병의 대부분이 이 노출에 기인합니다. 노출 제거 시 이 그룹의 대부분 사례를 예방할 수 있습니다.',
+      afHigh: '높은 귀속분율 (50–75%) — 노출군 질병의 절반 이상이 이 노출에 기인합니다. 노출을 대상으로 한 중재가 상당한 효과를 가져올 수 있습니다.',
+      afMod: '중간 귀속분율 (25–50%) — 노출군 질병의 상당 부분이 이 노출에 기인합니다. 의미 있는 인과적 역할을 합니다.',
+      afLow: '낮은 귀속분율 (<25%) — 노출군 질병의 소수만 이 노출에 기인합니다. 다른 요인들이 더 큰 역할을 할 가능성이 높습니다.',
+      afNeg: '보호적 요인 — 이 노출은 질병 위험을 감소시킵니다 (RR < 1). 노출이 없는 경우보다 노출군에서 질병 발생이 더 적습니다.',
+      // Interpretation — PAF
+      pafHigh: '높은 인구 영향 (≥50%) — 전체 인구 질병 부담의 대부분이 이 노출에 기인합니다. 인구 수준의 중재로 질병 발생률을 크게 줄일 수 있습니다.',
+      pafMod: '중간 인구 영향 (25–50%) — 질병 부담의 상당 부분이 이 노출에 기인합니다. 인구 수준의 중재가 의미 있는 감소를 가져올 것입니다.',
+      pafLow: '제한적 인구 영향 (<25%) — 노출-질병 연관성이 있더라도 전체 질병 부담 중 이 노출에 귀속되는 분율은 작습니다.',
+      pafNeg: '보호적 노출 — 이 요인은 인구 수준에서 질병 부담을 감소시킵니다 (RR < 1).',
+      // Notes
+      afNote: '귀속분율은 인과관계를 전제합니다. 노출이 질병을 유발한다는 강력한 증거가 있을 때만 적용하세요.',
+      pafNote: 'PAF는 Levin의 공식입니다. 노출을 전체 인구에서 제거했을 때 감소될 수 있는 질병 부담량을 추정합니다.',
+      // Common
       loadExample: '예제 불러오기',
       reset: '초기화',
       invalidInput: '유효한 값을 입력하면 결과가 표시됩니다',

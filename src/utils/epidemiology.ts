@@ -207,6 +207,26 @@ export function calcScreening(t: TwoByTwoTable): ScreeningMetrics {
   };
 }
 
+// ── Attributable Fraction (AF%) ────────────────────────────
+// AF = (RR - 1) / RR × 100
+// Proportion of disease in the exposed group attributable to the exposure.
+// Assumes causality; RR must be > 0.
+export function calcAttributableFraction(rr: number): number | null {
+  if (!isFinite(rr) || rr <= 0) return null;
+  return ((rr - 1) / rr) * 100;
+}
+
+// ── Population Attributable Fraction (PAF%) — Levin's formula ──
+// PAF = Pe(RR-1) / [1 + Pe(RR-1)] × 100
+// Pe = proportion of the TOTAL population that is exposed (0–1).
+// Estimates the fraction of disease burden that would be eliminated
+// if the exposure were removed from the entire population.
+export function calcPopAttributableFraction(rr: number, pe: number): number | null {
+  if (!isFinite(rr) || !isFinite(pe) || rr <= 0 || pe < 0 || pe > 1) return null;
+  const numer = pe * (rr - 1);
+  return (numer / (1 + numer)) * 100;
+}
+
 // ── Formatters ─────────────────────────────────────────────
 export function fmtNum(n: number, decimals = 2): string {
   if (!isFinite(n)) return '—';

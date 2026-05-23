@@ -5,11 +5,12 @@ import RiskMetrics from './RiskMetrics';
 import AttackRate from './AttackRate';
 import VaccineEfficacy from './VaccineEfficacy';
 import BurdenOfDisease from './BurdenOfDisease';
+import AttributableRisk from './AttributableRisk';
 import './EpiCalculator.css';
 
 interface Props { lang: Lang }
 
-type SubTab = 'risk' | 'freq' | 'vaccine' | 'burden';
+type SubTab = 'risk' | 'freq' | 'vaccine' | 'burden' | 'attrib';
 
 const EpiCalculator: React.FC<Props> = ({ lang }) => {
   const [subTab, setSubTab] = useState<SubTab>('risk');
@@ -21,6 +22,7 @@ const EpiCalculator: React.FC<Props> = ({ lang }) => {
     freq:    { title: t.attackRate.title,                subtitle: t.attackRate.subtitle },
     vaccine: { title: t.vaccineEfficacy.title,           subtitle: t.vaccineEfficacy.subtitle },
     burden:  { title: t.burden.title,                    subtitle: t.burden.subtitle },
+    attrib:  { title: t.attributableRisk.title,          subtitle: t.attributableRisk.subtitle },
   };
 
   const { title, subtitle } = titles[subTab];
@@ -38,6 +40,7 @@ const EpiCalculator: React.FC<Props> = ({ lang }) => {
           ['freq',    te.tabDiseaseFreq],
           ['vaccine', te.tabVaccineEfficacy],
           ['burden',  te.tabBurden],
+          ['attrib',  te.tabAttributableRisk],
         ] as [SubTab, string][]).map(([key, label]) => (
           <button
             key={key}
@@ -49,10 +52,11 @@ const EpiCalculator: React.FC<Props> = ({ lang }) => {
         ))}
       </div>
 
-      {subTab === 'risk'    && <RiskMetrics     lang={lang} />}
-      {subTab === 'freq'    && <AttackRate       lang={lang} />}
-      {subTab === 'vaccine' && <VaccineEfficacy  lang={lang} />}
-      {subTab === 'burden'  && <BurdenOfDisease  lang={lang} />}
+      {subTab === 'risk'    && <RiskMetrics       lang={lang} />}
+      {subTab === 'freq'    && <AttackRate         lang={lang} />}
+      {subTab === 'vaccine' && <VaccineEfficacy    lang={lang} />}
+      {subTab === 'burden'  && <BurdenOfDisease    lang={lang} />}
+      {subTab === 'attrib'  && <AttributableRisk   lang={lang} />}
     </div>
   );
 };
