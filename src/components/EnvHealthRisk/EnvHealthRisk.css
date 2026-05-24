@@ -1,0 +1,464 @@
+/* ═══════════════════════════════════════════════════════════════
+   EnvHealthRisk — Environmental Health Risk Assessment Styles
+   Prefixed with .eh- to avoid collisions.
+   Layout classes (.bs-layout, .bs-left, etc.) are globally
+   available from BiostatCalc.css once bundled.
+   ═══════════════════════════════════════════════════════════════ */
+
+/* QALY loss bar: muted warm red – visible on both light & dark backgrounds */
+:root        { --eh-loss: #cb8b78; }
+[data-theme="dark"] { --eh-loss: #e09a86; }
+
+.eh-calc {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: var(--space-8) var(--space-6);
+  animation: fadeUp 0.4s ease both;
+}
+
+/* Section label (matches .sir-section-label pattern) */
+.eh-section-label {
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--color-primary);
+}
+
+/* ── Route selector tabs ─────────────────────────────────────── */
+.eh-route-bar {
+  display: flex;
+  gap: var(--space-1);
+  background: var(--bg-surface-2);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  padding: var(--space-1);
+  width: 100%;
+}
+
+.eh-route-btn {
+  flex: 1;
+  padding: var(--space-2) var(--space-3);
+  border-radius: calc(var(--radius-md) - 2px);
+  font-family: var(--font-body);
+  font-size: 0.8rem;
+  font-weight: 500;
+  cursor: pointer;
+  border: none;
+  background: transparent;
+  color: var(--text-muted);
+  transition: all var(--transition-fast);
+  white-space: nowrap;
+  text-align: center;
+}
+
+.eh-route-btn:hover:not(.active) {
+  color: var(--text-primary);
+  background: var(--bg-surface-3);
+}
+
+.eh-route-btn.active {
+  background: var(--color-primary);
+  color: var(--text-on-primary);
+  font-weight: 600;
+}
+
+/* ── QALY states table ──────────────────────────────────────── */
+.eh-states-wrap {
+  background: var(--bg-surface);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  padding: var(--space-4) var(--space-5);
+}
+
+.eh-states-header {
+  display: grid;
+  /* name gets the remaining space (min 110px); utility, years, remove are compact */
+  grid-template-columns: minmax(110px, 1fr) 68px 58px 30px;
+  gap: var(--space-2);
+  margin-bottom: var(--space-2);
+  font-size: 0.68rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--text-muted);
+  padding: 0 var(--space-1);
+}
+
+.eh-state-row {
+  display: grid;
+  grid-template-columns: minmax(110px, 1fr) 68px 58px 30px;
+  gap: var(--space-2);
+  margin-bottom: var(--space-2);
+  align-items: center;
+}
+
+.eh-state-row:last-of-type {
+  margin-bottom: 0;
+}
+
+.eh-state-controls {
+  display: flex;
+  gap: var(--space-2);
+  margin-top: var(--space-3);
+  padding-top: var(--space-3);
+  border-top: 1px solid var(--border-color-light);
+}
+
+/* ── QALY hero ───────────────────────────────────────────────── */
+.eh-qaly-hero {
+  background: var(--bg-surface);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  padding: var(--space-5) var(--space-6);
+  text-align: center;
+}
+
+.eh-qaly-hero-value {
+  font-family: var(--font-mono);
+  font-size: 3rem;
+  font-weight: 500;
+  color: var(--color-primary);
+  line-height: 1.1;
+  margin: var(--space-2) 0 var(--space-1);
+}
+
+.eh-qaly-hero-sub {
+  font-size: 0.78rem;
+  color: var(--text-muted);
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+/* ── Traffic light ───────────────────────────────────────────── */
+.eh-traffic {
+  background: var(--bg-surface);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  padding: var(--space-4) var(--space-5);
+}
+
+.eh-traffic-title {
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--text-muted);
+  margin-bottom: var(--space-4);
+}
+
+.eh-traffic-lights {
+  display: flex;
+  justify-content: center;
+  gap: var(--space-6);
+}
+
+.eh-light-cell {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-2);
+  /* 0.45 keeps all three circles clearly visible while active stands out */
+  opacity: 0.45;
+  transition: opacity var(--transition-base), transform var(--transition-fast);
+}
+
+.eh-light-cell.active {
+  opacity: 1;
+  transform: scale(1.08);
+}
+
+.eh-light-circle {
+  width: 52px;
+  height: 52px;
+  border-radius: 50%;
+  transition: background var(--transition-base), box-shadow var(--transition-base);
+  border: 2px solid transparent;
+}
+
+.eh-light-cell.active .eh-light-circle {
+  box-shadow: 0 0 16px 4px currentColor;
+}
+
+.eh-light-cell--concern .eh-light-circle { background: var(--color-danger); }
+.eh-light-cell--caution .eh-light-circle { background: var(--color-accent); }
+.eh-light-cell--safe    .eh-light-circle { background: var(--color-primary); }
+
+.eh-light-cell.active.eh-light-cell--concern .eh-light-circle {
+  box-shadow: 0 0 16px 4px var(--color-danger);
+}
+.eh-light-cell.active.eh-light-cell--caution .eh-light-circle {
+  box-shadow: 0 0 16px 4px var(--color-accent);
+}
+.eh-light-cell.active.eh-light-cell--safe .eh-light-circle {
+  box-shadow: 0 0 16px 4px var(--color-primary);
+}
+
+.eh-light-label {
+  font-size: 0.72rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--text-muted);
+}
+
+.eh-light-cell.active .eh-light-label {
+  color: var(--text-primary);
+}
+
+/* ── Risk level badge ────────────────────────────────────────── */
+.eh-risk-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-2) var(--space-4);
+  border-radius: var(--radius-md);
+  font-size: 0.85rem;
+  font-weight: 700;
+  border: 1px solid;
+  letter-spacing: 0.03em;
+}
+
+.eh-risk-badge--concern {
+  background: color-mix(in srgb, var(--color-danger) 12%, transparent);
+  color: var(--color-danger);
+  border-color: color-mix(in srgb, var(--color-danger) 35%, transparent);
+}
+
+.eh-risk-badge--caution {
+  background: color-mix(in srgb, var(--color-accent) 12%, transparent);
+  color: var(--color-accent);
+  border-color: color-mix(in srgb, var(--color-accent) 35%, transparent);
+}
+
+.eh-risk-badge--safe,
+.eh-risk-badge--negligible {
+  background: color-mix(in srgb, var(--color-primary) 12%, transparent);
+  color: var(--color-primary);
+  border-color: color-mix(in srgb, var(--color-primary) 35%, transparent);
+}
+
+.eh-risk-badge--acceptable {
+  background: color-mix(in srgb, var(--color-info) 12%, transparent);
+  color: var(--color-info);
+  border-color: color-mix(in srgb, var(--color-info) 35%, transparent);
+}
+
+/* ── Scientific notation display ─────────────────────────────── */
+.eh-sci-card {
+  background: var(--bg-surface);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  padding: var(--space-5) var(--space-6);
+  text-align: center;
+}
+
+.eh-sci-label {
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--text-muted);
+  margin-bottom: var(--space-2);
+}
+
+.eh-sci-value {
+  font-family: var(--font-mono);
+  font-size: 2.6rem;
+  font-weight: 500;
+  line-height: 1.1;
+  margin: var(--space-2) 0;
+  letter-spacing: -0.02em;
+}
+
+.eh-sci-value sup {
+  font-size: 1.4rem;
+}
+
+/* ── Cancer Risk scale ───────────────────────────────────────── */
+.eh-scale-card {
+  background: var(--bg-surface);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  padding: var(--space-4) var(--space-5);
+}
+
+.eh-scale-title {
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--text-muted);
+  margin-bottom: var(--space-3);
+}
+
+.eh-scale-track {
+  position: relative;
+  height: 18px;
+  border-radius: 9px;
+  overflow: visible;
+  display: flex;
+  margin-bottom: var(--space-3);
+}
+
+.eh-scale-zone {
+  height: 100%;
+  transition: flex var(--transition-base);
+}
+
+.eh-scale-zone--negligible {
+  flex: 2;
+  background: color-mix(in srgb, var(--color-primary) 55%, transparent);
+  border-radius: 9px 0 0 9px;
+}
+
+.eh-scale-zone--acceptable {
+  flex: 2;
+  background: color-mix(in srgb, var(--color-accent) 65%, transparent);
+}
+
+.eh-scale-zone--concern {
+  flex: 2;
+  background: color-mix(in srgb, var(--color-danger) 55%, transparent);
+  border-radius: 0 9px 9px 0;
+}
+
+.eh-scale-marker-wrap {
+  position: absolute;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 2;
+  pointer-events: none;
+  transition: left var(--transition-base);
+}
+
+.eh-scale-marker {
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: var(--text-primary);
+  border: 2px solid var(--bg-surface);
+  box-shadow: var(--shadow-md);
+}
+
+.eh-scale-labels {
+  display: flex;
+  justify-content: space-between;
+  font-family: var(--font-mono);
+  font-size: 0.65rem;
+  color: var(--text-muted);
+  padding: 0 var(--space-1);
+}
+
+.eh-scale-zone-labels {
+  display: flex;
+  margin-top: var(--space-2);
+}
+
+.eh-scale-zone-label {
+  flex: 1;
+  text-align: center;
+  font-size: 0.68rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+/* ── Interpretation card with colored top border ─────────────── */
+.eh-interp-card {
+  background: var(--bg-surface);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  padding: var(--space-4) var(--space-5);
+  border-left: 4px solid var(--color-primary);
+}
+
+.eh-interp-card--concern  { border-left-color: var(--color-danger); }
+.eh-interp-card--caution  { border-left-color: var(--color-accent); }
+.eh-interp-card--safe     { border-left-color: var(--color-primary); }
+.eh-interp-card--acceptable { border-left-color: var(--color-info); }
+.eh-interp-card--negligible { border-left-color: var(--color-primary); }
+
+.eh-interp-title {
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--text-muted);
+  margin-bottom: var(--space-2);
+}
+
+.eh-interp-body {
+  font-size: 0.9rem;
+  color: var(--text-primary);
+  line-height: 1.55;
+}
+
+/* ── CDI highlight row ───────────────────────────────────────── */
+.eh-cdi-row {
+  display: flex;
+  align-items: center;
+  gap: var(--space-4);
+  background: var(--bg-surface);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  padding: var(--space-3) var(--space-5);
+}
+
+.eh-cdi-label {
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--text-muted);
+  flex-shrink: 0;
+}
+
+.eh-cdi-value {
+  font-family: var(--font-mono);
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+/* ── Responsive ──────────────────────────────────────────────── */
+@media (max-width: 960px) {
+  .eh-states-header,
+  .eh-state-row {
+    grid-template-columns: minmax(100px, 1fr) 66px 54px 28px;
+  }
+}
+
+@media (max-width: 600px) {
+  .eh-calc {
+    padding: var(--space-5) var(--space-4);
+  }
+
+  .eh-states-header,
+  .eh-state-row {
+    grid-template-columns: minmax(80px, 1fr) 64px 52px 28px;
+    gap: var(--space-1);
+  }
+
+  .eh-qaly-hero-value {
+    font-size: 2.2rem;
+  }
+
+  .eh-sci-value {
+    font-size: 2rem;
+  }
+
+  .eh-sci-value sup {
+    font-size: 1.1rem;
+  }
+
+  .eh-light-circle {
+    width: 40px;
+    height: 40px;
+  }
+
+  .eh-traffic-lights {
+    gap: var(--space-4);
+  }
+}

@@ -4,13 +4,14 @@ import EpiCalculator from './components/EpiCalculator/index';
 import ScreeningCalc from './components/ScreeningCalc';
 import SIRSimulator from './components/SIRSimulator/SIRSimulator';
 import BiostatCalc from './components/BiostatCalc';
+import EnvHealthRisk from './components/EnvHealthRisk/EnvHealthRisk';
 import AddToHomeScreen from './components/common/AddToHomeScreen';
 import FeedbackButton from './components/common/FeedbackButton';
 import type { Lang } from './i18n/translations';
 import './styles/variables.css';
 import './App.css';
 
-type Tab = 'epi' | 'screening' | 'sir' | 'biostat';
+type Tab = 'epi' | 'screening' | 'sir' | 'biostat' | 'env';
 type Theme = 'light' | 'dark';
 
 function App() {
@@ -62,10 +63,11 @@ function App() {
         onTabChange={(t) => setTab(t as Tab)}
       />
       <main className="app-main">
-        {tab === 'epi' && <EpiCalculator lang={lang} />}
-        {tab === 'screening' && <ScreeningCalc lang={lang} />}
-        {tab === 'sir' && <SIRSimulator lang={lang} />}
-        {tab === 'biostat' && <BiostatCalc lang={lang} />}
+        {tab === 'epi'      && <EpiCalculator  lang={lang} />}
+        {tab === 'screening' && <ScreeningCalc  lang={lang} />}
+        {tab === 'sir'      && <SIRSimulator   lang={lang} />}
+        {tab === 'biostat'  && <BiostatCalc    lang={lang} />}
+        {tab === 'env'      && <EnvHealthRisk  lang={lang} />}
       </main>
       <footer className="app-footer">
         <div className="footer-inner">
