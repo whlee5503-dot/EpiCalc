@@ -66,13 +66,18 @@ const Header: React.FC<HeaderProps> = ({
         </nav>
 
         <div className="header-controls">
-          <button
-            className="control-btn lang-btn"
-            onClick={onLangToggle}
-            title="Toggle language"
-          >
-            {lang === 'en' ? '한국어' : 'EN'}
-          </button>
+          <div className="lang-toggle" role="group" aria-label="Language">
+            <button
+              className={`lang-toggle-btn${lang === 'ko' ? ' active' : ''}`}
+              onClick={() => lang !== 'ko' && onLangToggle()}
+              aria-pressed={lang === 'ko'}
+            >KO</button>
+            <button
+              className={`lang-toggle-btn${lang === 'en' ? ' active' : ''}`}
+              onClick={() => lang !== 'en' && onLangToggle()}
+              aria-pressed={lang === 'en'}
+            >EN</button>
+          </div>
           <button
             className="control-btn theme-btn"
             onClick={onThemeToggle}

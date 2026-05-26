@@ -113,13 +113,47 @@
   transition: all var(--transition-fast);
 }
 
-.lang-btn {
-  padding: var(--space-2) var(--space-3);
+/* KO | EN pill toggle */
+.lang-toggle {
+  display: flex;
+  align-items: center;
+  background: var(--bg-surface-2);
+  border: 1px solid var(--border-color);
+  border-radius: 20px;
+  padding: 3px;
+  gap: 0;
+}
+
+.lang-toggle-btn {
+  background: transparent;
+  border: none;
+  cursor: pointer;
   font-family: var(--font-body);
-  font-size: 0.8rem;
-  font-weight: 600;
-  letter-spacing: 0.02em;
-  height: 34px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: var(--text-muted);
+  padding: 4px 10px;
+  border-radius: 16px;
+  transition: all var(--transition-fast);
+  letter-spacing: 0.06em;
+  min-width: 34px;
+  text-align: center;
+  line-height: 1;
+}
+
+.lang-toggle-btn.active {
+  background: var(--bg-surface);
+  color: var(--color-primary);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12);
+}
+
+[data-theme="dark"] .lang-toggle-btn.active {
+  background: var(--bg-surface-3);
+  box-shadow: none;
+}
+
+.lang-toggle-btn:hover:not(.active) {
+  color: var(--text-secondary);
 }
 
 .theme-btn {

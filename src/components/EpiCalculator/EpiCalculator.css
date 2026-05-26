@@ -189,10 +189,51 @@
   gap: var(--space-4);
 }
 
-/* ── Secondary sub-tab bar (inside sub-tabs) ── */
-.epi-sub2-bar {
-  margin-bottom: var(--space-6);
-  flex-wrap: wrap;
+/* ── Epi sub-tab bar (bs-subtab-* styles are also in BiostatCalc.css,
+      but that chunk loads lazily — define here so Epi tab works
+      immediately on first load) ── */
+.bs-subtab-bar {
+  display: flex;
+  gap: var(--space-2);
+  background: var(--bg-surface);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  padding: var(--space-1);
+  width: 100%;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+
+.bs-subtab-bar::-webkit-scrollbar {
+  display: none;
+}
+
+.bs-subtab-btn {
+  padding: var(--space-2) var(--space-4);
+  border-radius: calc(var(--radius-md) - 2px);
+  font-family: var(--font-body);
+  font-size: 0.8rem;
+  font-weight: 500;
+  cursor: pointer;
+  border: 1px solid transparent;
+  background: transparent;
+  color: var(--text-muted);
+  transition: all var(--transition-fast);
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.bs-subtab-btn:hover:not(.active) {
+  color: var(--text-primary);
+  background: var(--bg-surface-2);
+  border-color: var(--border-color-light);
+}
+
+.bs-subtab-btn.active {
+  background: color-mix(in srgb, var(--color-primary) 15%, transparent);
+  color: var(--color-primary);
+  font-weight: 600;
+  border-color: color-mix(in srgb, var(--color-primary) 25%, transparent);
 }
 
 /* ── Age-Adjusted Rate strata table ── */
