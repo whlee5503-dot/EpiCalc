@@ -30,8 +30,8 @@ type SubTab =
 
 const GROUPS: { id: GroupTab; subtabs: SubTab[] }[] = [
   { id: 'descriptive',    subtabs: ['descstats', 'samplesize'] },
-  { id: 'parametric',     subtabs: ['ztest', 'ttest', 'pairedttest', 'anova', 'linreg', 'correlation', 'kaplanmeier', 'logreg'] },
-  { id: 'nonparametric',  subtabs: ['chisquare', 'fishers', 'wilcoxon', 'mcnemar', 'kruskalwallis', 'spearman'] },
+  { id: 'parametric',     subtabs: ['ztest', 'ttest', 'pairedttest', 'anova', 'correlation', 'linreg', 'logreg', 'kaplanmeier'] },
+  { id: 'nonparametric',  subtabs: ['chisquare', 'fishers', 'mcnemar', 'wilcoxon', 'kruskalwallis', 'spearman'] },
 ];
 
 const BiostatCalc: React.FC<Props> = ({ lang }) => {
