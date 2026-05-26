@@ -1,12 +1,14 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, lazy, Suspense } from 'react';
 import Header from './components/Header';
-import EpiCalculator from './components/EpiCalculator/index';
-import ScreeningCalc from './components/ScreeningCalc';
-import SIRSimulator from './components/SIRSimulator/SIRSimulator';
-import BiostatCalc from './components/BiostatCalc';
-import EnvHealthRisk from './components/EnvHealthRisk/EnvHealthRisk';
 import AddToHomeScreen from './components/common/AddToHomeScreen';
 import FeedbackButton from './components/common/FeedbackButton';
+
+// Lazy-load each tab — each becomes a separate JS chunk
+const EpiCalculator = lazy(() => import('./components/EpiCalculator/index'));
+const ScreeningCalc = lazy(() => import('./components/ScreeningCalc'));
+const SIRSimulator  = lazy(() => import('./components/SIRSimulator/SIRSimulator'));
+const BiostatCalc   = lazy(() => import('./components/BiostatCalc'));
+const EnvHealthRisk = lazy(() => import('./components/EnvHealthRisk/EnvHealthRisk'));
 import type { Lang } from './i18n/translations';
 import './styles/variables.css';
 import './App.css';
@@ -63,11 +65,13 @@ function App() {
         onTabChange={(t) => setTab(t as Tab)}
       />
       <main className="app-main">
-        {tab === 'epi'      && <EpiCalculator  lang={lang} />}
-        {tab === 'screening' && <ScreeningCalc  lang={lang} />}
-        {tab === 'sir'      && <SIRSimulator   lang={lang} />}
-        {tab === 'biostat'  && <BiostatCalc    lang={lang} />}
-        {tab === 'env'      && <EnvHealthRisk  lang={lang} />}
+        <Suspense fallback={<div className="tab-loading">Loading…</div>}>
+          {tab === 'epi'       && <EpiCalculator lang={lang} />}
+          {tab === 'screening' && <ScreeningCalc lang={lang} />}
+          {tab === 'sir'       && <SIRSimulator  lang={lang} />}
+          {tab === 'biostat'   && <BiostatCalc   lang={lang} />}
+          {tab === 'env'       && <EnvHealthRisk lang={lang} />}
+        </Suspense>
       </main>
       <footer className="app-footer">
         <div className="footer-inner">

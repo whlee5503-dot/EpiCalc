@@ -122,15 +122,36 @@ sensitive public health contexts.
 
 ---
 
+## ⚡ Performance & Offline Support
+
+EpiCalc is optimized for low-bandwidth environments (2G/3G), in line with its mission to serve public health workers in low-resource settings.
+
+| Metric | Before | After |
+|--------|--------|-------|
+| Initial JS bundle (gzip) | ~239 KB | ~104 KB (**~57% reduction**) |
+| BiostatCalc + recharts (gzip) | bundled in initial load | ~119 KB — lazy, on first tab visit |
+| Service worker precache | none | ~139 KB (CSS + HTML + icons only) |
+| 2G first load | slow (single 911 KB bundle) | fast (app shell only, tab chunks deferred) |
+
+**How it works:**
+- **Lazy loading**: Each of the 5 tabs (Epi Metrics, Screening, SIR Model, Biostatistics, Env Health) loads its JS chunk only when first visited
+- **Code splitting**: React, recharts/d3, and app code are split into separate cacheable chunks
+- **Runtime caching**: Tab chunks are cached after first access (CacheFirst, 30-day TTL) for instant offline use
+- **PWA**: Full offline support after the first visit — install to home screen for native-like experience
+- **BiostatCalc** (heaviest tab — 14 sub-calculators + charts) loads on demand, never blocks initial paint
+
+---
+
 ## 🛠️ Tech Stack
 
 | Category | Technology |
 |----------|-----------|
-| Frontend | React 18 + TypeScript |
+| Frontend | React 19 + TypeScript |
 | Build Tool | Vite |
 | Charts | Recharts |
 | Styling | CSS Variables (Dark mode support) |
 | i18n | Korean / English toggle |
+| PWA / SW | vite-plugin-pwa + Workbox |
 | Deployment | Cloudflare Pages |
 | Dev Environment | Firebase Studio |
 

@@ -28,3 +28,13 @@
 .footer-sep {
   opacity: 0.4;
 }
+
+/* Lazy loading fallback */
+.tab-loading {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 200px;
+  color: var(--text-secondary, #888);
+  font-size: 0.9rem;
+}
