@@ -1,6 +1,7 @@
-import React from 'react';
+import React, { useState } from 'react';
 import type { Lang } from '../i18n/translations';
 import { translations } from '../i18n/translations';
+import HelpModal from './HelpModal';
 import './Header.css';
 
 interface HeaderProps {
@@ -39,6 +40,7 @@ const Header: React.FC<HeaderProps> = ({
   lang, theme, activeTab, onLangToggle, onThemeToggle, onTabChange
 }) => {
   const t = translations[lang];
+  const [showHelp, setShowHelp] = useState(false);
 
   return (
     <header className="app-header">
@@ -66,6 +68,14 @@ const Header: React.FC<HeaderProps> = ({
         </nav>
 
         <div className="header-controls">
+          <button
+            className="control-btn help-btn"
+            onClick={() => setShowHelp(true)}
+            title={t.help.btnLabel}
+            aria-label={t.help.btnLabel}
+          >
+            ?
+          </button>
           <div className="lang-toggle" role="group" aria-label="Language">
             <button
               className={`lang-toggle-btn${lang === 'ko' ? ' active' : ''}`}
@@ -88,6 +98,8 @@ const Header: React.FC<HeaderProps> = ({
           </button>
         </div>
       </div>
+
+      {showHelp && <HelpModal lang={lang} onClose={() => setShowHelp(false)} />}
     </header>
   );
 };

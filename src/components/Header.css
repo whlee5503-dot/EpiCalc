@@ -161,6 +161,14 @@
   height: 34px;
 }
 
+.help-btn {
+  width: 34px;
+  height: 34px;
+  font-family: var(--font-body);
+  font-weight: 700;
+  font-size: 0.9rem;
+}
+
 .control-btn:hover {
   background: var(--bg-surface-3);
   border-color: var(--color-primary);
