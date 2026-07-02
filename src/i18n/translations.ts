@@ -21,9 +21,9 @@ export const translations = {
       navMap: [
         { tab: 'Epi Metrics', contains: 'Risk Metrics (RR/OR/ARR/NNT), Disease Frequency (Attack Rate), Vaccine Efficacy, Burden of Disease, Attributable Risk' },
         { tab: 'Screening', contains: 'Sensitivity, Specificity, PPV, NPV, LR+, LR− from a 2×2 test performance matrix' },
-        { tab: 'SIR Model', contains: 'Compartmental (SIR) epidemic simulator' },
+        { tab: 'SIR Model', contains: 'Compartmental epidemic simulator, toggle between SIR and SEIR (adds an Exposed compartment)' },
         { tab: 'Biostat', contains: '16 tests across three groups — Descriptive (Descriptive Stats, Sample Size), Parametric (Z/T/Paired-T/ANOVA, Correlation, Linear/Logistic Regression, Kaplan-Meier), Non-parametric (Chi-square, Fisher\'s Exact, McNemar, Wilcoxon, Kruskal-Wallis, Spearman)' },
-        { tab: 'Env Health', contains: 'Environmental health risk assessment' },
+        { tab: 'Env Health', contains: 'Environmental exposure risk assessment (Hazard Quotient for non-cancer risk, Cancer Risk Assessment for lifetime excess cancer risk) and QALY (Quality-Adjusted Life Years) calculation' },
       ],
       disclaimerTitle: 'Reference tool, not a substitute for review',
       disclaimerDesc: 'EpiCalc is intended for education, quick reference, and exploratory analysis. Each result panel already shows the formula or CI method used (e.g. Wilson score, Woolf log, exact hypergeometric, continuity-corrected McNemar). Independently verify any value used for a publication, protocol, or clinical decision.',
@@ -683,9 +683,9 @@ export const translations = {
       navMap: [
         { tab: '역학 지표', contains: '위험도 지표(RR/OR/ARR/NNT), 질병 빈도(발병률), 백신 효능, 질병 부담, 기여위험도' },
         { tab: '스크리닝', contains: '2×2 검사 성능표 기반 민감도, 특이도, PPV, NPV, LR+, LR−' },
-        { tab: 'SIR 모델', contains: '구획모형(SIR) 전염병 시뮬레이터' },
+        { tab: 'SIR 모델', contains: '구획모형 전염병 시뮬레이터, SIR과 SEIR(노출군 추가) 모델 전환 가능' },
         { tab: '생물통계', contains: '3개 그룹, 16개 검정 — 기술통계(기술통계량, 표본크기), 모수적(Z/T/대응T/ANOVA, 상관분석, 선형/로지스틱 회귀, Kaplan-Meier), 비모수적(카이제곱, Fisher 정확검정, McNemar, Wilcoxon, Kruskal-Wallis, Spearman)' },
-        { tab: '환경 위험', contains: '환경보건 위험도 평가' },
+        { tab: '환경 위험', contains: '환경 노출 위험도 평가(비발암 위험도의 위험지수 HQ, 발암 위험도 평가)와 QALY(질보정생존년수) 계산' },
       ],
       disclaimerTitle: '참고용 도구이며 검토를 대체하지 않습니다',
       disclaimerDesc: 'EpiCalc은 교육, 빠른 참조, 탐색적 분석을 위한 도구입니다. 각 결과 카드에는 이미 사용된 공식이나 신뢰구간 산출 방법(Wilson score, Woolf log, 정확 초기하검정, 연속성 수정 McNemar 등)이 표시되어 있습니다. 논문, 프로토콜, 임상 의사결정에 사용할 값은 반드시 별도로 검증하시기 바랍니다.',
