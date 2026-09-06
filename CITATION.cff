@@ -1,0 +1,34 @@
+cff-version: 1.2.0
+message: "If you use EpiCalc in your research or work, please cite it as below."
+title: "EpiCalc: Free Public Health Calculator"
+type: software
+authors:
+  - family-names: "Lee"
+    given-names: "Won Ho"
+    orcid: "https://orcid.org/0009-0005-1866-8257"
+    affiliation: "PublicHealth Tech Lab"
+repository-code: "https://github.com/whlee5503-dot/EpiCalc"
+url: "https://epi.chem-health-calc.com"
+license: MIT
+version: 1.0.0
+date-released: "2026-05-14"
+keywords:
+  - epidemiology
+  - biostatistics
+  - public health
+  - epidemic simulation
+  - screening tests
+  - digital public good
+  - open source
+abstract: >-
+  EpiCalc is a free, mobile-friendly, open-source web application for
+  epidemiology metrics, epidemic simulation, and biostatistics. Features
+  include risk metrics (RR, OR, ARR, NNT), disease frequency measures
+  (attack rate, CFR, mortality rates), vaccine efficacy and herd immunity
+  threshold, burden of disease (DALYs, YLL, YLD), screening test
+  performance (sensitivity, specificity, PPV, NPV, likelihood ratios), an
+  interactive SIR/SEIR epidemic simulator with real-time R0
+  visualization, and a biostatistics calculator (sample size, Z-test,
+  t-test, chi-square, ANOVA). The app runs entirely client-side as an
+  installable, offline-capable Progressive Web App, with no data
+  collection, and is optimized for low-bandwidth (2G/3G) environments.
