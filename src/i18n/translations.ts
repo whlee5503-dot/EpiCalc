@@ -574,6 +574,12 @@ export const translations = {
       undefined: 'Undefined',
       showMore: 'Show more ↓',
       showLess: 'Show less ↑',
+      disclaimer: 'This tool is for epidemiological and educational purposes. It does not replace professional statistical consultation for publication-grade analyses.',
+      footer: {
+        siblingsHeading: 'Part of the PHT Lab family',
+        hub: 'phtlab.org',
+        orcid: 'ORCID',
+      },
     },
     envHealth: {
       // Sub-tab titles
@@ -1224,6 +1230,12 @@ export const translations = {
       undefined: '정의 불가',
       showMore: '자세히 보기 ↓',
       showLess: '접기 ↑',
+      disclaimer: '이 도구는 역학 연구 및 교육 목적으로 제공됩니다. 논문 등 출판용 분석을 위한 전문 통계 상담을 대체하지 않습니다.',
+      footer: {
+        siblingsHeading: 'PHT Lab 앱 패밀리',
+        hub: 'phtlab.org',
+        orcid: 'ORCID',
+      },
     },
     envHealth: {
       // Sub-tab titles
@@ -1317,4 +1329,3 @@ export const translations = {
 } as const;
 
 export type TranslationKey = keyof typeof translations.en;
-

@@ -2,6 +2,7 @@ import { useState, useEffect, lazy, Suspense } from 'react';
 import Header from './components/Header';
 import AddToHomeScreen from './components/common/AddToHomeScreen';
 import FeedbackButton from './components/common/FeedbackButton';
+import Footer from './components/common/Footer';
 
 // Lazy-load each tab — each becomes a separate JS chunk
 const EpiCalculator = lazy(() => import('./components/EpiCalculator/index'));
@@ -10,6 +11,7 @@ const SIRSimulator  = lazy(() => import('./components/SIRSimulator/SIRSimulator'
 const BiostatCalc   = lazy(() => import('./components/BiostatCalc'));
 const EnvHealthRisk = lazy(() => import('./components/EnvHealthRisk/EnvHealthRisk'));
 import type { Lang } from './i18n/translations';
+import { translations } from './i18n/translations';
 import './styles/variables.css';
 import './App.css';
 
@@ -54,6 +56,8 @@ function App() {
     localStorage.setItem('epicalc-prefs', JSON.stringify({ lang, theme: next }));
   };
 
+  const t = translations[lang];
+
   return (
     <div className="app-root">
       <Header
@@ -73,13 +77,15 @@ function App() {
           {tab === 'env'       && <EnvHealthRisk lang={lang} />}
         </Suspense>
       </main>
-      <footer className="app-footer">
-        <div className="footer-inner">
-          <span>EpiCalc © {new Date().getFullYear()}</span>
-          <span className="footer-sep">·</span>
-          <span>Public Health Calculator</span>
-        </div>
-      </footer>
+      <Footer
+        currentAppId="epicalc"
+        disclaimer={t.common.disclaimer}
+        labels={{
+          siblingsHeading: t.common.footer.siblingsHeading,
+          hub: t.common.footer.hub,
+          orcid: t.common.footer.orcid,
+        }}
+      />
       <AddToHomeScreen lang={lang} />
       <FeedbackButton lang={lang} />
     </div>
