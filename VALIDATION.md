@@ -19,7 +19,7 @@ SIR / SEIR / SEIRD compartmental ODE systems.
   fatality rate (CFR): dR/dt = (1-CFR)·γI, dD/dt = CFR·γI
 
 **Implementation**: `src/utils/sirModel.ts`
-**Tests**: `src/utils/sirModel.test.ts` (8 tests, Vitest)
+**Tests**: `src/utils/sirModel.test.ts` (13 tests, Vitest)
 
 ### Test Case 1 — SEIRD → SEIR regression (CFR = 0)
 
@@ -77,6 +77,76 @@ regression test rather than an external worked example.
   with the ~0.2% CFR (bounded below N × CFR × 1.2 in the test).
 
 - Result: **PASS** (`src/utils/sirModel.test.ts`)
+
+---
+
+## Module: Intervention Overlay (Lockdown / Vaccination)
+
+**Method**: `runSimulationWithInterventions` orchestrates the existing,
+already-validated `runSimulation` function — it does not alter the SIR /
+SEIR / SEIRD differential equations themselves. It splits the requested
+timeline into segments at each intervention's day, runs `runSimulation`
+independently for each segment (carrying the previous segment's final
+compartment values forward as the next segment's starting point), and
+stitches the results into one continuous timeline.
+
+- **Lockdown**: from its effective day onward, β is set to
+  `originalBeta × betaMultiplier` (multipliers are relative to the
+  original β, not stacked across multiple lockdowns, so scenarios with
+  several lockdowns/reopenings remain easy to reason about).
+- **Vaccination**: on its effective day, a specified fraction of the
+  *current* susceptible pool (S) is moved instantaneously into the
+  recovered/immune pool (R).
+
+Because this module is a pure orchestration layer over already-validated
+logic, its own tests focus on **internal consistency and non-regression**
+rather than an external epidemiological worked example (the underlying
+epidemic math is validated separately, above, via the measles example).
+
+**Implementation**: `src/utils/sirModel.ts` (`runSimulationWithInterventions`)
+**Tests**: `src/utils/sirModel.test.ts`, describe block "intervention overlay" (5 tests)
+
+### Test Case 1 — No-op equivalence
+
+Calling `runSimulationWithInterventions` with an empty intervention list
+must produce output identical to calling `runSimulation` directly with the
+same parameters (same data points, peak, peak day, and final β).
+
+- Result: **PASS**
+
+### Test Case 2 — Lockdown reduces the epidemic peak
+
+A lockdown (β reduced to 20% of baseline partway through the timeline)
+must produce a lower peak infection count than the same scenario without
+the lockdown, with the output timeline remaining gap-free and
+non-duplicated across the internal segment boundary.
+
+- Result: **PASS**
+
+### Test Case 3 — Vaccination moves S → R at the intervention day
+
+A vaccination intervention moving 50% of the susceptible pool must show
+that exact drop in S and matching rise in R at the specified day
+(within integer-rounding tolerance from independently rounding S and R).
+
+- Result: **PASS**
+
+### Test Case 4 — Combined scenario conserves population (SEIRD)
+
+A three-intervention scenario (lockdown → vaccination → reopening) on the
+SEIRD model must conserve total population (S+E+I+R+D ≈ N) at every
+simulated day, produce a complete day-by-day timeline, and correctly
+report the final β as fully reopened (equal to the original β).
+
+- Result: **PASS**
+
+### Test Case 5 — Out-of-range interventions are ignored
+
+An intervention scheduled beyond the simulation's total day count must
+have no effect on the result (identical peak and final β to a run with no
+interventions at all).
+
+- Result: **PASS**
 
 ---
 

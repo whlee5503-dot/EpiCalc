@@ -7,8 +7,15 @@
 
 /* Reuse fadeUp from EpiCalculator */
 @keyframes fadeUp {
-  from { opacity: 0; transform: translateY(16px); }
-  to   { opacity: 1; transform: translateY(0); }
+  from {
+    opacity: 0;
+    transform: translateY(16px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 /* ── Two-column layout ── */
@@ -116,8 +123,13 @@
   letter-spacing: -0.03em;
 }
 
-.sir-r0-value.danger { color: var(--color-danger); }
-.sir-r0-value.safe   { color: var(--color-primary); }
+.sir-r0-value.danger {
+  color: var(--color-danger);
+}
+
+.sir-r0-value.safe {
+  color: var(--color-primary);
+}
 
 .sir-r0-status {
   font-size: 0.8rem;
@@ -125,8 +137,13 @@
   margin-top: var(--space-1);
 }
 
-.sir-r0-status.danger { color: var(--color-danger-light); }
-.sir-r0-status.safe   { color: var(--color-primary-light); }
+.sir-r0-status.danger {
+  color: var(--color-danger-light);
+}
+
+.sir-r0-status.safe {
+  color: var(--color-primary-light);
+}
 
 .sir-herd-threshold {
   margin-top: var(--space-2);
@@ -299,9 +316,11 @@
   .sir-simulator {
     padding: var(--space-5) var(--space-4);
   }
+
   .sir-stats-grid {
     grid-template-columns: 1fr 1fr;
   }
+
   .sir-r0-top {
     flex-direction: column;
     gap: var(--space-1);
@@ -312,4 +331,125 @@
   .sir-stats-grid {
     grid-template-columns: 1fr;
   }
+}
+
+/* ── Interventions Panel (add after .sir-params-panel block) ── */
+.sir-interventions-panel {
+  background: var(--bg-surface);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  padding: var(--space-4) var(--space-5);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.sir-interventions-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.sir-add-intervention-btn {
+  border: 1px solid var(--color-primary);
+  background: transparent;
+  color: var(--color-primary);
+  border-radius: var(--radius-sm);
+  padding: var(--space-1) var(--space-3);
+  font-size: 0.75rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.sir-add-intervention-btn:hover {
+  background: var(--color-primary);
+  color: var(--text-on-primary);
+}
+
+.sir-intervention-empty {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  line-height: 1.6;
+}
+
+.sir-intervention-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.sir-intervention-row {
+  display: grid;
+  grid-template-columns: 56px 1fr 1fr auto;
+  gap: var(--space-2);
+  align-items: end;
+  padding: var(--space-2) var(--space-3);
+  background: var(--bg-surface-2);
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border-color);
+}
+
+.sir-intervention-field {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.sir-intervention-field span {
+  font-size: 0.65rem;
+  color: var(--text-muted);
+  font-weight: 500;
+}
+
+.sir-intervention-field input,
+.sir-intervention-field select {
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-sm);
+  background: var(--bg-surface);
+  color: var(--text-primary);
+  font-family: var(--font-mono);
+  font-size: 0.8rem;
+  padding: var(--space-1) var(--space-2);
+  outline: none;
+  min-width: 0;
+}
+
+.sir-intervention-field input:focus,
+.sir-intervention-field select:focus {
+  border-color: var(--color-primary);
+  box-shadow: var(--shadow-focus);
+}
+
+.sir-intervention-remove-btn {
+  border: none;
+  background: none;
+  color: var(--text-muted);
+  font-size: 1.1rem;
+  line-height: 1;
+  cursor: pointer;
+  padding: var(--space-1) var(--space-2);
+  border-radius: var(--radius-sm);
+  transition: all var(--transition-fast);
+}
+
+.sir-intervention-remove-btn:hover {
+  color: var(--color-danger);
+  background: var(--bg-surface);
+}
+
+@media (max-width: 480px) {
+  .sir-intervention-row {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+/* ── Stats grid: allow a 4th card (Cumulative Deaths, SEIRD only) ── */
+/* Replace the existing ".sir-stats-grid { grid-template-columns: repeat(3, 1fr); }"
+   rule with this one — same look with 3 cards, wraps cleanly with 4. */
+.sir-stats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: var(--space-4);
 }

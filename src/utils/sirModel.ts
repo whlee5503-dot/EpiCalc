@@ -17,6 +17,19 @@ export interface SimParams {
    * death (cfr·γ·I). Optional so SIR/SEIR callers don't need to change.
    */
   cfr?: number;
+  /**
+   * Internal/advanced use: start the simulation from an explicit
+   * compartment state instead of deriving S/E/I/R/D from N, I0 and
+   * vaccinationRate. Used by runSimulationWithInterventions to chain
+   * segments together. Ordinary callers should omit this.
+   */
+  initialState?: { S: number; E: number; I: number; R: number; D: number };
+  /**
+   * Internal/advanced use: offset the `day` field in the returned data
+   * points, so a segment that represents days 30–60 of a longer timeline
+   * reports day: 30, 31, ... instead of restarting at 0. Defaults to 0.
+   */
+  dayOffset?: number;
 }
 
 export interface DataPoint {
@@ -144,14 +157,20 @@ function stepSEIRD(
 export function runSimulation(p: SimParams): SimResult {
   const { model, N, I0, beta, gamma, sigma, vaccinationRate, days } = p;
   const cfr = Math.min(Math.max(p.cfr ?? 0, 0), 1);
+  const dayOffset = p.dayOffset ?? 0;
 
-  // Vaccinated individuals start immune (in R compartment)
-  const vaccinated = Math.min(Math.floor(N * vaccinationRate), Math.max(0, N - I0));
-  let S = Math.max(0, N - I0 - vaccinated);
-  let E = 0;
-  let I = Math.min(I0, N - vaccinated);
-  let R = vaccinated;
-  let D = 0;
+  let S: number, E: number, I: number, R: number, D: number;
+  if (p.initialState) {
+    ({ S, E, I, R, D } = p.initialState);
+  } else {
+    // Vaccinated individuals start immune (in R compartment)
+    const vaccinated = Math.min(Math.floor(N * vaccinationRate), Math.max(0, N - I0));
+    S = Math.max(0, N - I0 - vaccinated);
+    E = 0;
+    I = Math.min(I0, N - vaccinated);
+    R = vaccinated;
+    D = 0;
+  }
 
   const r0 = gamma > 0 ? beta / gamma : 0;
   const herdImmunityThreshold = r0 > 1 ? 1 - 1 / r0 : 0;
@@ -162,7 +181,7 @@ export function runSimulation(p: SimParams): SimResult {
 
   for (let day = 0; day <= days; day++) {
     data.push({
-      day,
+      day: day + dayOffset,
       S: Math.round(Math.max(0, S)),
       E: model !== 'SIR' ? Math.round(Math.max(0, E)) : null,
       I: Math.round(Math.max(0, I)),
@@ -172,7 +191,7 @@ export function runSimulation(p: SimParams): SimResult {
 
     if (I > peakInfected) {
       peakInfected = I;
-      peakDay = day;
+      peakDay = day + dayOffset;
     }
 
     if (model === 'SIR') {
@@ -196,5 +215,130 @@ export function runSimulation(p: SimParams): SimResult {
     r0,
     herdImmunityThreshold,
     totalDeaths: Math.round(D),
+  };
+}
+
+// ---------------------------------------------------------------------------
+// Intervention overlay (lockdown / vaccination), built on top of the
+// unmodified runSimulation above. Does not alter SIR/SEIR/SEIRD dynamics —
+// it only chains segments with different beta or compartment values.
+// ---------------------------------------------------------------------------
+
+export interface Intervention {
+  /** Day (0-indexed, same timeline as the overall simulation) the intervention takes effect. */
+  day: number;
+  type: 'lockdown' | 'vaccination';
+  /**
+   * lockdown: multiplier applied to the ORIGINAL beta from this day onward
+   * (e.g. 0.5 halves transmission relative to the un-intervened value).
+   * Not stacked multiplicatively across lockdowns — see doc comment on
+   * runSimulationWithInterventions.
+   */
+  betaMultiplier?: number;
+  /** vaccination: fraction of the *current* susceptible pool moved to R on this day. */
+  vaccinationRate?: number;
+}
+
+export interface InterventionSimResult extends SimResult {
+  /** The beta in effect during the final segment (after all lockdowns applied). */
+  finalBeta: number;
+}
+
+/**
+ * Runs a SIR/SEIR/SEIRD simulation over `params.days`, applying a list of
+ * lockdown/vaccination interventions at their specified days. Interventions
+ * are applied in day order; a `day` beyond `params.days` is ignored.
+ *
+ * Each lockdown's betaMultiplier is applied to the *original* params.beta
+ * (not multiplicatively stacked) — i.e. passing betaMultiplier: 0.5 always
+ * means "50% of the original beta", making scenarios easy to reason about
+ * even with multiple lockdowns/reopenings.
+ */
+export function runSimulationWithInterventions(
+  params: SimParams,
+  interventions: Intervention[],
+): InterventionSimResult {
+  const sortedInterventions = [...interventions]
+    .filter((iv) => iv.day > 0 && iv.day <= params.days)
+    .sort((a, b) => a.day - b.day);
+
+  const boundaryDays = [0, ...sortedInterventions.map((iv) => iv.day), params.days];
+  const uniqueBoundaries = [...new Set(boundaryDays)].sort((a, b) => a - b);
+
+  const allData: DataPoint[] = [];
+  let peakInfected = -Infinity;
+  let peakDay = 0;
+  let currentBeta = params.beta;
+  let currentState: { S: number; E: number; I: number; R: number; D: number } | undefined;
+  const baseR0 = params.gamma > 0 ? params.beta / params.gamma : 0;
+  const baseHIT = baseR0 > 1 ? 1 - 1 / baseR0 : 0;
+
+  for (let segIdx = 0; segIdx < uniqueBoundaries.length - 1; segIdx++) {
+    const segStart = uniqueBoundaries[segIdx];
+    const segEnd = uniqueBoundaries[segIdx + 1];
+
+    // Apply any interventions that fall exactly at segStart (after the
+    // first segment) before running this segment.
+    if (segIdx > 0) {
+      for (const iv of sortedInterventions.filter((i) => i.day === segStart)) {
+        if (iv.type === 'lockdown' && iv.betaMultiplier !== undefined) {
+          currentBeta = params.beta * iv.betaMultiplier;
+        } else if (iv.type === 'vaccination' && iv.vaccinationRate !== undefined && currentState) {
+          const newlyVaccinated = currentState.S * Math.min(Math.max(iv.vaccinationRate, 0), 1);
+          currentState = {
+            ...currentState,
+            S: currentState.S - newlyVaccinated,
+            R: currentState.R + newlyVaccinated,
+          };
+        }
+      }
+    }
+
+    const segDays = segEnd - segStart;
+    const segResult = runSimulation({
+      ...params,
+      beta: currentBeta,
+      days: segDays,
+      dayOffset: segStart,
+      initialState: currentState, // undefined for the first segment, uses N/I0/vaccinationRate as before
+    });
+
+    // The boundary day is shared between this segment's first point and the
+    // previous segment's last point. This segment's version is the correct
+    // one to keep (it reflects any intervention just applied at segStart),
+    // so drop the stale duplicate from the previous segment rather than
+    // this segment's own first point.
+    if (segIdx > 0) {
+      allData.pop();
+    }
+    allData.push(...segResult.data);
+
+    for (const pt of segResult.data) {
+      if (pt.I > peakInfected) {
+        peakInfected = pt.I;
+        peakDay = pt.day;
+      }
+    }
+
+    const last = segResult.data[segResult.data.length - 1];
+    currentState = {
+      S: last.S,
+      E: last.E ?? 0,
+      I: last.I,
+      R: last.R,
+      D: last.D ?? 0,
+    };
+  }
+
+  const finalD = currentState?.D ?? 0;
+
+  return {
+    data: allData,
+    peakInfected: Math.round(peakInfected),
+    peakDay,
+    r0: baseR0,
+    herdImmunityThreshold: baseHIT,
+    totalDeaths: Math.round(finalD),
+    finalBeta: currentBeta,
   };
 }

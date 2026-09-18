@@ -164,9 +164,13 @@
 .help-btn {
   width: 34px;
   height: 34px;
+  border-radius: 50%;
   font-family: var(--font-body);
   font-weight: 700;
   font-size: 0.9rem;
+  background: color-mix(in srgb, var(--color-primary) 10%, var(--bg-surface-2));
+  border-color: color-mix(in srgb, var(--color-primary) 30%, var(--border-color));
+  color: var(--color-primary);
 }
 
 .control-btn:hover {
@@ -181,11 +185,16 @@
     padding: 0 var(--space-4);
     gap: var(--space-3);
   }
-  .brand-tagline { display: none; }
+
+  .brand-tagline {
+    display: none;
+  }
+
   .header-nav {
     gap: 0;
     justify-content: center;
   }
+
   .nav-tab {
     padding: var(--space-2) var(--space-3);
     font-size: 0.8rem;
@@ -193,6 +202,11 @@
 }
 
 @media (max-width: 480px) {
-  .header-inner { height: 56px; }
-  .brand-name { font-size: 1.1rem; }
+  .header-inner {
+    height: 56px;
+  }
+
+  .brand-name {
+    font-size: 1.1rem;
+  }
 }

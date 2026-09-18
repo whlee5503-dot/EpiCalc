@@ -1,11 +1,11 @@
 import React, { useState, useMemo } from 'react';
 import {
-  LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer,
+  LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ReferenceLine, ResponsiveContainer,
 } from 'recharts';
 import type { Lang } from '../../i18n/translations';
 import { translations } from '../../i18n/translations';
-import type { SimParams } from '../../utils/sirModel';
-import { runSimulation } from '../../utils/sirModel';
+import type { SimParams, Intervention, ModelType } from '../../utils/sirModel';
+import { runSimulationWithInterventions } from '../../utils/sirModel';
 import './SIRSimulator.css';
 
 interface SIRSimulatorProps {
@@ -34,12 +34,15 @@ const EXAMPLE_PARAMS: SimParams = {
   days: 180,
 };
 
+const DEFAULT_CFR = 0.02;
+
 // Chart colors from design system
 const CHART = {
   S: '#3498db',
   E: '#f39c12',
   I: '#e74c3c',
   R: '#2ecc71',
+  D: '#5b5b5b',
 };
 
 interface ParamRowProps {
@@ -84,6 +87,11 @@ function fmtPercent(v: number): string {
   return `${(v * 100).toFixed(1)}%`;
 }
 
+let nextInterventionId = 1;
+interface EditableIntervention extends Intervention {
+  id: number;
+}
+
 const SIRSimulator: React.FC<SIRSimulatorProps> = ({ lang }) => {
   const [params, setParams] = useState<SimParams>(() => {
     const sp = new URLSearchParams(window.location.search);
@@ -100,15 +108,47 @@ const SIRSimulator: React.FC<SIRSimulatorProps> = ({ lang }) => {
     }
     return { ...DEFAULT_PARAMS, ...overrides };
   });
+  const [interventions, setInterventions] = useState<EditableIntervention[]>([]);
   const ts = translations[lang].sir;
 
-  const result = useMemo(() => runSimulation(params), [params]);
+  const result = useMemo(
+    () => runSimulationWithInterventions(params, interventions),
+    [params, interventions],
+  );
 
   const patch = (partial: Partial<SimParams>) =>
     setParams(prev => ({ ...prev, ...partial }));
 
+  const selectModel = (m: ModelType) => {
+    patch({
+      model: m,
+      cfr: m === 'SEIRD' ? (params.cfr ?? DEFAULT_CFR) : params.cfr,
+    });
+  };
+
+  const addIntervention = () => {
+    setInterventions(prev => [
+      ...prev,
+      {
+        id: nextInterventionId++,
+        day: Math.max(1, Math.round(params.days / 2)),
+        type: 'lockdown',
+        betaMultiplier: 0.5,
+      },
+    ]);
+  };
+
+  const updateIntervention = (id: number, patchIv: Partial<EditableIntervention>) => {
+    setInterventions(prev => prev.map(iv => (iv.id === id ? { ...iv, ...patchIv } : iv)));
+  };
+
+  const removeIntervention = (id: number) => {
+    setInterventions(prev => prev.filter(iv => iv.id !== id));
+  };
+
   const r0 = result.r0;
   const r0Safe = r0 <= 1;
+  const isSEIRD = params.model === 'SEIRD';
 
   return (
     <div className="sir-simulator">
@@ -118,18 +158,18 @@ const SIRSimulator: React.FC<SIRSimulatorProps> = ({ lang }) => {
       </div>
 
       <div className="sir-layout">
-        {/* ── Left: Controls ── */}
+        {/* Left: Controls */}
         <div className="sir-left">
 
           {/* Model toggle */}
           <div className="sir-model-toggle">
             <div className="sir-section-label">{ts.modelToggle}</div>
             <div className="sir-toggle-btns">
-              {(['SIR', 'SEIR'] as const).map(m => (
+              {(['SIR', 'SEIR', 'SEIRD'] as const).map(m => (
                 <button
                   key={m}
                   className={`sir-toggle-btn${params.model === m ? ' active' : ''}`}
-                  onClick={() => patch({ model: m })}
+                  onClick={() => selectModel(m)}
                 >
                   {m}
                 </button>
@@ -137,7 +177,7 @@ const SIRSimulator: React.FC<SIRSimulatorProps> = ({ lang }) => {
             </div>
           </div>
 
-          {/* R₀ live display */}
+          {/* R0 live display */}
           <div className="sir-r0-card">
             <div className="sir-r0-top">
               <span className="sir-r0-label">{ts.r0Label}</span>
@@ -174,7 +214,7 @@ const SIRSimulator: React.FC<SIRSimulatorProps> = ({ lang }) => {
               display={params.gamma.toFixed(2)}
               onChange={(v) => patch({ gamma: v })}
             />
-            {params.model === 'SEIR' && (
+            {params.model !== 'SIR' && (
               <ParamRow
                 label={ts.sigma}
                 value={params.sigma}
@@ -183,8 +223,17 @@ const SIRSimulator: React.FC<SIRSimulatorProps> = ({ lang }) => {
                 onChange={(v) => patch({ sigma: v })}
               />
             )}
+            {isSEIRD && (
+              <ParamRow
+                label={ts.cfr}
+                value={params.cfr ?? DEFAULT_CFR}
+                min={0} max={0.2} step={0.001}
+                display={`${((params.cfr ?? DEFAULT_CFR) * 100).toFixed(1)}%`}
+                onChange={(v) => patch({ cfr: v })}
+              />
+            )}
 
-            {/* N and I₀ as number inputs */}
+            {/* N and I0 as number inputs */}
             <div className="sir-param-item">
               <div className="sir-param-header">
                 <span className="sir-param-label">{ts.population}</span>
@@ -234,18 +283,95 @@ const SIRSimulator: React.FC<SIRSimulatorProps> = ({ lang }) => {
             />
           </div>
 
+          {/* Interventions */}
+          <div className="sir-interventions-panel">
+            <div className="sir-interventions-header">
+              <div className="sir-section-label" style={{ marginBottom: 0 }}>{ts.interventions}</div>
+              <button className="sir-add-intervention-btn" type="button" onClick={addIntervention}>
+                {ts.addIntervention}
+              </button>
+            </div>
+
+            {interventions.length === 0 ? (
+              <p className="sir-intervention-empty">{ts.noInterventions}</p>
+            ) : (
+              <div className="sir-intervention-list">
+                {interventions.map((iv) => (
+                  <div className="sir-intervention-row" key={iv.id}>
+                    <label className="sir-intervention-field sir-intervention-field--day">
+                      <span>{ts.interventionDay}</span>
+                      <input
+                        type="number"
+                        min={1}
+                        max={params.days}
+                        value={iv.day}
+                        onChange={(e) => updateIntervention(iv.id, { day: Number(e.target.value) })}
+                      />
+                    </label>
+                    <label className="sir-intervention-field">
+                      <span>{ts.interventionType}</span>
+                      <select
+                        value={iv.type}
+                        onChange={(e) => {
+                          const newType = e.target.value as Intervention['type'];
+                          updateIntervention(iv.id, {
+                            type: newType,
+                            betaMultiplier: newType === 'lockdown' ? (iv.betaMultiplier ?? 0.5) : undefined,
+                            vaccinationRate: newType === 'vaccination' ? (iv.vaccinationRate ?? 0.3) : undefined,
+                          });
+                        }}
+                      >
+                        <option value="lockdown">{ts.lockdown}</option>
+                        <option value="vaccination">{ts.vaccinationEvent}</option>
+                      </select>
+                    </label>
+                    {iv.type === 'lockdown' ? (
+                      <label className="sir-intervention-field">
+                        <span>{ts.betaMultiplier}</span>
+                        <input
+                          type="number"
+                          min={0} max={2} step={0.05}
+                          value={iv.betaMultiplier ?? 0.5}
+                          onChange={(e) => updateIntervention(iv.id, { betaMultiplier: Number(e.target.value) })}
+                        />
+                      </label>
+                    ) : (
+                      <label className="sir-intervention-field">
+                        <span>{ts.vaccinationEventRate}</span>
+                        <input
+                          type="number"
+                          min={0} max={100} step={1}
+                          value={Math.round((iv.vaccinationRate ?? 0.3) * 100)}
+                          onChange={(e) => updateIntervention(iv.id, { vaccinationRate: Number(e.target.value) / 100 })}
+                        />
+                      </label>
+                    )}
+                    <button
+                      className="sir-intervention-remove-btn"
+                      type="button"
+                      aria-label={ts.removeIntervention}
+                      onClick={() => removeIntervention(iv.id)}
+                    >
+                      ×
+                    </button>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+
           {/* Actions */}
           <div className="calc-actions">
             <button className="btn btn-secondary" onClick={() => setParams(EXAMPLE_PARAMS)}>
               {ts.loadExample}
             </button>
-            <button className="btn btn-ghost" onClick={() => setParams(DEFAULT_PARAMS)}>
+            <button className="btn btn-ghost" onClick={() => { setParams(DEFAULT_PARAMS); setInterventions([]); }}>
               {ts.reset}
             </button>
           </div>
         </div>
 
-        {/* ── Right: Chart + Stats ── */}
+        {/* Right: Chart + Stats */}
         <div className="sir-right">
 
           {/* Epidemic curve */}
@@ -293,7 +419,7 @@ const SIRSimulator: React.FC<SIRSimulatorProps> = ({ lang }) => {
                   dot={false}
                   activeDot={{ r: 4 }}
                 />
-                {params.model === 'SEIR' && (
+                {params.model !== 'SIR' && (
                   <Line
                     type="monotone"
                     dataKey="E"
@@ -322,6 +448,30 @@ const SIRSimulator: React.FC<SIRSimulatorProps> = ({ lang }) => {
                   dot={false}
                   activeDot={{ r: 4 }}
                 />
+                {isSEIRD && (
+                  <Line
+                    type="monotone"
+                    dataKey="D"
+                    name={ts.deceased}
+                    stroke={CHART.D}
+                    strokeWidth={2}
+                    dot={false}
+                    activeDot={{ r: 4 }}
+                  />
+                )}
+                {interventions.map((iv) => (
+                  <ReferenceLine
+                    key={iv.id}
+                    x={iv.day}
+                    stroke={iv.type === 'lockdown' ? 'var(--color-danger)' : 'var(--color-primary)'}
+                    strokeDasharray="4 3"
+                    label={{
+                      value: iv.type === 'lockdown' ? '🔒' : '💉',
+                      position: 'top',
+                      fontSize: 12,
+                    }}
+                  />
+                ))}
               </LineChart>
             </ResponsiveContainer>
           </div>
@@ -350,6 +500,15 @@ const SIRSimulator: React.FC<SIRSimulatorProps> = ({ lang }) => {
               </div>
               <div className="sir-stat-sub">R₀ = {r0.toFixed(2)}</div>
             </div>
+            {isSEIRD && (
+              <div className="sir-stat-card">
+                <div className="sir-stat-label">{ts.totalDeaths}</div>
+                <div className="sir-stat-value" style={{ color: CHART.D }}>
+                  {fmtPop(result.totalDeaths)}
+                </div>
+                <div className="sir-stat-sub">{ts.people}</div>
+              </div>
+            )}
           </div>
         </div>
       </div>

@@ -1,5 +1,9 @@
 import { describe, it, expect } from "vitest";
-import { runSimulation, type SimParams } from "./sirModel.js";
+import {
+    runSimulation,
+    runSimulationWithInterventions,
+    type SimParams,
+} from "./sirModel.js";
 
 describe("sirModel — SIR/SEIR regression (unchanged behavior)", () => {
     it("SIR result is unaffected by the SEIRD addition", () => {
@@ -77,10 +81,6 @@ describe("sirModel — SEIRD self-consistency", () => {
     });
 
     it("deaths and recoveries split in proportion to CFR (D / (R − R0) ≈ cfr / (1 − cfr))", () => {
-        // dR/dt = (1-cfr)*gamma*I and dD/dt = cfr*gamma*I share the same I(t),
-        // so algebraically D(t) / (R(t) - R(0)) should equal cfr/(1-cfr)
-        // regardless of the specific epidemic curve — a model-internal identity,
-        // not a worked example, but a strong regression check.
         const cfr = 0.1;
         const result = runSimulation({ ...baseParams, cfr });
         const last = result.data[result.data.length - 1];
@@ -97,11 +97,9 @@ describe("sirModel — measles worked example (CDC / Lancet)", () => {
     //   Lancet Infect Dis. 2017;17(12):e420-e428.
     // - Incubation period ~10-12 days to prodrome, infectious 4 days before to
     //   4 days after rash onset (~8-day infectious window): CDC Pink Book,
-    //   Ch. 13 Measles (cdc.gov/pinkbook/hcp/table-of-contents/chapter-13-measles.html)
+    //   Ch. 13 Measles.
     // - Case fatality ~0.2%: CDC measles complications summary
     //   (stacks.cdc.gov/view/cdc/124379)
-    //
-    // Derived parameters: sigma = 1/10, gamma = 1/8, beta = R0 * gamma = 1.875
     const measlesParams: SimParams = {
         model: "SEIRD",
         N: 100000,
@@ -120,9 +118,6 @@ describe("sirModel — measles worked example (CDC / Lancet)", () => {
     });
 
     it("herd immunity threshold ≈ 93.3%, matching the independently reported figure for R0=15", () => {
-        // Cross-check: multiple public-health sources state that an R0 of 15
-        // implies roughly 93% vaccination coverage is needed for herd immunity
-        // (1 - 1/15 = 0.9333...), independent of this app's own R0 calculation.
         const result = runSimulation(measlesParams);
         expect(result.herdImmunityThreshold).toBeCloseTo(14 / 15, 4);
         expect(result.herdImmunityThreshold).toBeCloseTo(0.9333, 3);
@@ -131,10 +126,90 @@ describe("sirModel — measles worked example (CDC / Lancet)", () => {
     it("cumulative deaths stay consistent with a ~0.2% case fatality rate", () => {
         const result = runSimulation(measlesParams);
         const last = result.data[result.data.length - 1];
-        // With R0=15 in a fully susceptible population, the epidemic infects
-        // nearly everyone by day 150, so deaths should approximate cfr * N.
         const totalDeaths = last.D ?? 0;
         expect(totalDeaths).toBeGreaterThan(0);
         expect(totalDeaths).toBeLessThan(measlesParams.N * measlesParams.cfr! * 1.2);
+    });
+});
+
+describe("sirModel — intervention overlay (lockdown / vaccination)", () => {
+    const baseParams: SimParams = {
+        model: "SEIR",
+        N: 100000,
+        I0: 10,
+        beta: 0.5,
+        gamma: 0.1,
+        sigma: 0.2,
+        vaccinationRate: 0,
+        days: 60,
+    };
+
+    it("with no interventions, matches plain runSimulation exactly", () => {
+        const plain = runSimulation(baseParams);
+        const noIv = runSimulationWithInterventions(baseParams, []);
+
+        expect(noIv.data.length).toBe(plain.data.length);
+        for (let i = 0; i < plain.data.length; i++) {
+            expect(noIv.data[i]).toEqual(plain.data[i]);
+        }
+        expect(noIv.peakInfected).toBe(plain.peakInfected);
+        expect(noIv.peakDay).toBe(plain.peakDay);
+        expect(noIv.finalBeta).toBe(baseParams.beta);
+    });
+
+    it("a lockdown meaningfully reduces the epidemic peak", () => {
+        const plain = runSimulation(baseParams);
+        const withLockdown = runSimulationWithInterventions(baseParams, [
+            { day: 20, type: "lockdown", betaMultiplier: 0.2 },
+        ]);
+
+        expect(withLockdown.peakInfected).toBeLessThan(plain.peakInfected);
+        expect(withLockdown.data.length).toBe(baseParams.days + 1);
+        expect(withLockdown.data.every((d, i) => d.day === i)).toBe(true);
+        expect(withLockdown.finalBeta).toBeCloseTo(baseParams.beta * 0.2, 10);
+    });
+
+    it("vaccination moves the specified fraction of S into R at the intervention day", () => {
+        const result = runSimulationWithInterventions(baseParams, [
+            { day: 10, type: "vaccination", vaccinationRate: 0.5 },
+        ]);
+        const dayBefore = result.data.find((d) => d.day === 9)!;
+        const dayOf = result.data.find((d) => d.day === 10)!;
+
+        expect(dayOf.S).toBeCloseTo(dayBefore.S * 0.5, -2);
+        const sDrop = dayBefore.S - dayOf.S;
+        const rGain = dayOf.R - dayBefore.R;
+        expect(Math.abs(sDrop - rGain)).toBeLessThanOrEqual(20);
+    });
+
+    it("combined lockdown + vaccination + reopening on SEIRD conserves population throughout", () => {
+        const seirdParams: SimParams = {
+            ...baseParams,
+            model: "SEIRD",
+            cfr: 0.02,
+            days: 90,
+        };
+        const result = runSimulationWithInterventions(seirdParams, [
+            { day: 20, type: "lockdown", betaMultiplier: 0.3 },
+            { day: 40, type: "vaccination", vaccinationRate: 0.4 },
+            { day: 60, type: "lockdown", betaMultiplier: 1.0 },
+        ]);
+
+        for (const d of result.data) {
+            const total = d.S + (d.E ?? 0) + d.I + d.R + (d.D ?? 0);
+            expect(Math.abs(total - seirdParams.N)).toBeLessThanOrEqual(5);
+        }
+        expect(result.data.length).toBe(seirdParams.days + 1);
+        expect(result.totalDeaths).toBeGreaterThan(0);
+        expect(result.finalBeta).toBeCloseTo(seirdParams.beta, 10);
+    });
+
+    it("ignores an intervention day beyond the simulation length", () => {
+        const withOutOfRange = runSimulationWithInterventions(baseParams, [
+            { day: 9999, type: "lockdown", betaMultiplier: 0.1 },
+        ]);
+        const plain = runSimulation(baseParams);
+        expect(withOutOfRange.peakInfected).toBe(plain.peakInfected);
+        expect(withOutOfRange.finalBeta).toBe(baseParams.beta);
     });
 });
