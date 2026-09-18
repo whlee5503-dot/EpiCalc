@@ -77,9 +77,11 @@ connectivity.
 - Likelihood Ratios (LR+, LR−)
 - Interactive 2×2 test matrix
 
-### 🦠 Epidemic Simulator (SIR / SEIR)
+### 🦠 Epidemic Simulator (SIR / SEIR / SEIRD)
 - Real-time R₀ visualization
 - Herd immunity threshold
+- Case fatality rate (CFR) modeling with the SEIRD variant — tracks a Deceased compartment alongside Susceptible, Exposed, Infectious, and Recovered
+- Intervention overlay — simulate lockdowns (transmission-rate reduction) and mid-outbreak vaccination campaigns at any point in the timeline, individually or combined
 - Vaccination rate effect simulation
 - Peak day & total case estimation
 
@@ -186,11 +188,16 @@ RR = [a/(a+b)] / [c/(c+d)]
 OR = (a×d) / (b×c)
 95% CI for RR = exp(ln(RR) ± 1.96 × √(1/a - 1/(a+b) + 1/c - 1/(c+d)))
 
-# SIR Model
+# SIR / SEIR Model
 dS/dt = -β×S×I/N
-dI/dt = β×S×I/N - γ×I
+dE/dt = β×S×I/N - σ×E   (SEIR/SEIRD only)
+dI/dt = σ×E - γ×I        (or β×S×I/N - γ×I for SIR)
 dR/dt = γ×I
 R₀ = β/γ
+
+# SEIRD Model (adds a Deceased compartment)
+dR/dt = (1 - CFR)×γ×I
+dD/dt = CFR×γ×I
 
 # Sample Size (Two-proportion)
 n = (Zα/2 + Zβ)² × [p1(1-p1) + p2(1-p2)] / (p1-p2)²
