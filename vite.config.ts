@@ -1,4 +1,4 @@
-import { defineConfig } from 'vite'
+import { defineConfig } from 'vitest/config'
 import react from '@vitejs/plugin-react'
 import { VitePWA } from 'vite-plugin-pwa'
 
@@ -63,6 +63,13 @@ export default defineConfig({
       },
     }),
   ],
+
+  // Vitest configuration — pure-logic tests (src/utils/*.test.ts) run under
+  // Node; switch to 'jsdom' later if React component tests are added.
+  test: {
+    environment: 'node',
+    globals: true,
+  },
 
   build: {
     rollupOptions: {
