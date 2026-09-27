@@ -11,6 +11,7 @@ export default defineConfig({
 
       // Web App Manifest
       manifest: {
+        id: '/',
         name: 'EpiCalc — Public Health Calculator',
         short_name: 'EpiCalc',
         description: 'Free epidemiology, biostatistics, and environmental health calculator',
@@ -19,19 +20,17 @@ export default defineConfig({
         display: 'standalone',
         start_url: '/',
         icons: [
-          {
-            src: '/favicon.svg',
-            sizes: 'any',
-            type: 'image/svg+xml',
-            purpose: 'any maskable',
-          },
+          { src: '/pwa-64x64.png', sizes: '64x64', type: 'image/png' },
+          { src: '/pwa-192x192.png', sizes: '192x192', type: 'image/png' },
+          { src: '/pwa-512x512.png', sizes: '512x512', type: 'image/png', purpose: 'any' },
+          { src: '/maskable-icon-512x512.png', sizes: '512x512', type: 'image/png', purpose: 'maskable' },
         ],
       },
 
       workbox: {
-        // 1. Precache ONLY the app shell (HTML + CSS + icons)
-        //    JS chunks are excluded — they use runtime caching below
-        globPatterns: ['**/*.{html,css,ico,png,svg,webmanifest}'],
+        // Precache the app shell and every JS chunk so all tabs work offline
+        globPatterns: ['**/*.{html,js,css,ico,png,svg,webmanifest,woff2}'],
+        maximumFileSizeToCacheInBytes: 3 * 1024 * 1024,
 
         // 2. Runtime caching for JS chunks (lazy-loaded tab components)
         runtimeCaching: [
